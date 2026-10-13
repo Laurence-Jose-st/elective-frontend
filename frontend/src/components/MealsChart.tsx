@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts'
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
 import '../App.css'
 
 interface MealsChartProps {
@@ -35,7 +35,7 @@ function MacroDonutChart({ data, title, unit, colors }: { data: any[], title: st
               dataKey="value"
               innerRadius={35}
             >
-              {data.map((_entry, index) => (
+              {data.map((entry, index) => (
                 <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
               ))}
             </Pie>
