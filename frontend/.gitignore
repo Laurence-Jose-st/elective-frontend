@@ -27,5 +27,3 @@ dist-ssr
 .agents
 .devin
 nul
-
-.env
