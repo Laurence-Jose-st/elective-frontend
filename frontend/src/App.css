@@ -276,3 +276,94 @@
   font-weight: 100;
   font-style: normal;
 }
+
+h6, h2, h3, h5, span, i, label, input, select {
+  font-family: "Finlandica Text", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.modal-title {
+  font-family: "Finlandica Text", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Meals Chart Styles */
+.meals-chart-container {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.meals-chart-item {
+  flex: 1;
+  font-family: "Finlandica Text", sans-serif;
+}
+
+.meals-chart-item-purple {
+  color: purple;
+}
+
+.meals-chart-item-blue {
+  color: blue;
+}
+
+.meals-chart-item-orange {
+  color: orange;
+}
+
+.meals-chart-item-red {
+  color: red;
+}
+
+.meals-chart-item-green {
+  color: green;
+}
+
+.meals-chart-title {
+  font-family: "Finlandica Text", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.btn-font {
+  font-family: "Finlandica Text", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* Exercise Search Results */
+.search-result-item {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
+  background-color: #f8f9fa;
+}
+
+.btn-color-complete {
+  background-color: #28a745;
+  color: white;
+}
+.btn-color-complete:hover {
+  filter: brightness(85%);
+  color: white; 
+  transition: filter 0.2s ease;
+}
+
+.btn-size {
+  padding: 10px 20px;
+}
+
+.text-fonts {
+  font-family: "Finlandica Text", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}

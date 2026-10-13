@@ -1,16 +1,14 @@
 import { useState } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
-interface RegisterProps {
-    onSubmit?: (data: { name: string; email: string; password: string }) => void
+interface SignupProps {
+    onSubmit?: (data: { username: string; email: string; password: string }) => void
     title?: string
-    redirectPath?: string
-
 }
 
 
-function Register({ onSubmit, title = 'Register' }: RegisterProps) {
-    const [name, setName] = useState('')
+function Signup({ onSubmit, title = 'Signup' }: SignupProps) {
+    const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')
@@ -23,10 +21,10 @@ function Register({ onSubmit, title = 'Register' }: RegisterProps) {
 
         try {
             if (onSubmit) {
-                await onSubmit({ name, email, password })
+                await onSubmit({ username, email, password })
             }
         } catch (err) {
-            setError('Registration failed')
+            setError('Signup failed')
         } finally {
             setIsLoading(false)
         }
@@ -44,21 +42,21 @@ function Register({ onSubmit, title = 'Register' }: RegisterProps) {
                             </div>
                         )}
 
-                    <form onSubmit={handleSubmit}>    
+                    <form onSubmit={handleSubmit}>
                         <div className="mb-3">
-                            <label htmlFor="name" className="form-label">Name</label>
+                            <label htmlFor="username" className="form-label">Username</label>
                             <input
                                 type="text"
                                 className="form-control"
-                                id="name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                id="username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
                                 required
-                                placeholder="Enter your name"
+                                placeholder="Enter your username"
                             />
                         </div>
-                        
-                        
+
+
                             <div className="mb-3">
                                 <label htmlFor="email" className="form-label">
                                     Email address
@@ -85,16 +83,16 @@ function Register({ onSubmit, title = 'Register' }: RegisterProps) {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    placeholder="Enter your password"
+                                    placeholder="Enter your password (min 6 characters)"
                                 />
                             </div>
-                        
+
                             <button
                                 type="submit"
                                 className="btn btn-primary w-100"
                                 disabled={isLoading}
                             >
-                                {isLoading ? 'Registering...' : 'Register'}
+                                {isLoading ? 'Signing up...' : 'Signup'}
                             </button>
                         </form>
 
@@ -112,4 +110,4 @@ function Register({ onSubmit, title = 'Register' }: RegisterProps) {
     )
 }
 
-export default Register;
+export default Signup;

@@ -7,7 +7,6 @@ import '../App.css'
 interface LoginProps {
   onLogin?: (credentials: { email: string; password: string }) => void
   title?: string
-  redirectPath?: string
   showRememberMe?: boolean
   showForgotPassword?: boolean
   customFields?: React.ReactNode
@@ -16,7 +15,6 @@ interface LoginProps {
 function Login({
   onLogin,
   title = 'Login',
-  redirectPath = '/dashboard',
   showRememberMe = true,
   showForgotPassword = true,
   customFields
@@ -182,8 +180,8 @@ function Login({
 
                   <div className="mt-3 text-center">
                     <span className="" style={{ color: '#fff' }}>Don't have an account? </span>
-                    <a href="/register" className="text-decoration-none" style={{ color: '#fff' }}>
-                      Register
+                    <a href="/signup" className="text-decoration-none" style={{ color: '#fff' }}>
+                      Signup
                     </a>
                   </div>
                 </div>

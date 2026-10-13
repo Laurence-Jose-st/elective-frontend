@@ -1,13 +1,18 @@
 import Login from '../components/Login'
 import { loginUser } from '../services/api'
+import { useAuth } from '../contexts/AuthContext'
 
 function LoginPage() {
+  const { login } = useAuth()
+
   const handleLogin = async (credentials: { email: string; password: string }) => {
     try {
-      const data = await loginUser(credentials)
-      console.log('Login successful:', data)
+      const response = await loginUser(credentials)
+      console.log('Login successful:', response)
 
-      localStorage.setItem('user', JSON.stringify(data))
+      // Use AuthContext login function
+      login(response.data.token, response.data.user)
+
       window.location.href = '/dashboard'
     } catch (error) {
       console.error('Login error:', error)
@@ -19,7 +24,6 @@ function LoginPage() {
     <Login
       onLogin={handleLogin}
       title="Welcome Back"
-      redirectPath="/dashboard"
     />
   )
 }
