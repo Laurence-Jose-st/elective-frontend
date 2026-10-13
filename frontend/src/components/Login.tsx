@@ -55,21 +55,21 @@ function Login({
         <Carousel.Item>
           <img
             className="d-block w-100 vh-100 object-fit-cover"
-            src="/src/assets/Image4.jpg"
+            src="/Image4.jpg"
             alt="First slide"
           />
         </Carousel.Item>
         <Carousel.Item>
           <img
             className="d-block w-100 vh-100 object-fit-cover"
-            src="/src/assets/Image1.jpg"
+            src="/Image1.jpg"
             alt="Second slide"
           />
         </Carousel.Item>
         <Carousel.Item>
           <img
             className="d-block w-100 vh-100 object-fit-cover"
-            src="/src/assets/Image3.jpg"
+            src="/Image3.jpg"
             alt="Third slide"
           />
         </Carousel.Item>
