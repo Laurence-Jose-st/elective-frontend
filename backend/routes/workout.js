@@ -16,5 +16,8 @@ router.post('/sessions/start', workoutController.startSession);
 router.put('/sessions/:sessionId/complete', workoutController.completeSession);
 router.delete('/sessions/:sessionId/cancel', workoutController.cancelSession);
 router.post('/sessions/exercises', workoutController.addExerciseToSession);
+router.post('/sessions', workoutController.saveSession);
+router.get('/sessions/completed', workoutController.getCompletedSessions);
+router.get('/progressive-overload', workoutController.getProgressiveOverload);
 
 export default router;
