@@ -12,5 +12,6 @@ router.get('/', mealController.getMeals);
 router.get('/history', mealController.getHistory);
 router.get('/daily-summary', mealController.getDailySummary);
 router.delete('/:id', mealController.deleteMeal);
+router.put('/:id', mealController.updateMeal);
 
 export default router;

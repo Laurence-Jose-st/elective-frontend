@@ -297,6 +297,23 @@ export const mealService = {
       throw new Error(data.error || 'Failed to fetch meals');
     }
 
+    console.log('API getMeals response:', data);
+    return data;
+  },
+
+  updateMeal: async (id: number, mealData: any) => {
+    const response = await fetch(`${API_BASE}/users/meals/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(mealData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to update meal');
+    }
+
     return data;
   },
 

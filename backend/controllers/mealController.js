@@ -294,4 +294,75 @@ export const mealController = {
       res.status(500).json({ success: false, error: error.message });
     }
   },
+
+  /**
+   * Update a meal log
+   */
+  async updateMeal(req, res) {
+    try {
+      const userId = req.user?.userId;
+      const { id } = req.params;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+
+      const { mealName, mealType, calories, proteinGrams, fiberGrams, carbsGrams, fatsGrams } = req.body;
+
+      if (!mealName || calories === undefined || proteinGrams === undefined || carbsGrams === undefined || fatsGrams === undefined) {
+        res.status(400).json({
+          success: false,
+          error: 'Missing required meal parameters: mealName, calories, proteinGrams, carbsGrams, fatsGrams.',
+          code: 'MEAL_PARAMS_MISSING',
+        });
+        return;
+      }
+
+      if (calories < 0 || proteinGrams < 0 || carbsGrams < 0 || fatsGrams < 0) {
+        res.status(400).json({
+          success: false,
+          error: 'Nutrient values cannot be negative numbers.',
+          code: 'NEGATIVE_NUTRIENTS',
+        });
+        return;
+      }
+
+      const updated = await prisma.meal_logs.updateMany({
+        where: {
+          id: parseInt(id),
+          user_id: userId
+        },
+        data: {
+          food_name: mealName.trim(),
+          meal_type: mealType || 'lunch',
+          calories: Number(calories),
+          protein: Number(proteinGrams),
+          fiber: fiberGrams !== undefined ? Number(fiberGrams) : 0,
+          carbs: Number(carbsGrams),
+          fats: Number(fatsGrams),
+        }
+      });
+
+      if (updated.count === 0) {
+        res.status(404).json({ success: false, error: 'Meal log not found.' });
+        return;
+      }
+
+      // Fetch the updated meal
+      const updatedMeal = await prisma.meal_logs.findFirst({
+        where: {
+          id: parseInt(id),
+          user_id: userId
+        }
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Meal updated successfully.',
+        data: updatedMeal,
+      });
+    } catch (error) {
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
 };
