@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import prisma from './lib/prisma.js';
 import routes from './routes/index.js';
+import calculatorRoutes from './routes/calculator.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import cors from 'cors';
 
@@ -17,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Root route
 app.get('/', (req, res) => {
-  res.json({ message: 'API is running', endpoints: ['/health', '/api', '/api/users'] });
+  res.json({ message: 'API is running', endpoints: ['/health', '/api', '/api/users', '/api/calculator'] });
 });
 
 // Health check route
@@ -32,6 +33,7 @@ app.get('/api', (req, res) => {
 
 // Use routes
 app.use('/api/users', routes);
+app.use('/api/calculator', calculatorRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

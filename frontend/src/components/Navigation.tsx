@@ -7,7 +7,8 @@ import '../App.css'
 const navItems = [
   { label: 'Home', path: '/dashboard' },
   { label: 'Workout', path: '/workout' },
-  { label: 'Meals', path: '/meals' }
+  { label: 'Meals', path: '/meals' },
+  { label: 'Calculator', path: '/calculator' }
 ]
 
 function Navigation() {

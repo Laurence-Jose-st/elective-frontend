@@ -316,3 +316,28 @@ export const mealService = {
   },
 };
 
+// Calculator API (Public - No authentication required)
+export const calculatorService = {
+  calculateBmi: async (data: {
+    weightKg: number;
+    heightCm: number;
+    age?: number;
+    gender?: string;
+    activityLevel?: string;
+  }) => {
+    const response = await fetch(`${API_BASE}/calculator/bmi`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to calculate BMI');
+    }
+
+    return result;
+  },
+};
+

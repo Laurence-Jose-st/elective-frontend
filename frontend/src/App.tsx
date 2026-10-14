@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import SignupPage from './pages/SignupPage'
 import WorkoutPage from './pages/WorkoutPage'
 import MealsPage from './pages/MealsPage'
+import CalculatorPage from './pages/CalculatorPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider } from './contexts/AuthContext'
 import 'bootstrap/dist/css/bootstrap.min.css'
@@ -33,6 +34,11 @@ function App() {
           <Route path="/meals" element={
             <ProtectedRoute>
               <MealsPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/calculator" element={
+            <ProtectedRoute>
+              <CalculatorPage />
             </ProtectedRoute>
           } />
           <Route path="*" element={<div>404 - Page Not Found</div>} />
