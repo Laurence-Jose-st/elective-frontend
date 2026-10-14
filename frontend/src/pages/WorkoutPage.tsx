@@ -64,6 +64,7 @@ function WorkoutPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Exercise[]>([])
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null)
+  const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([])
   const [isSearching, setIsSearching] = useState(false)
   const [refreshCharts, setRefreshCharts] = useState(0)
   const [previousWorkout, setPreviousWorkout] = useState<any>(null)
@@ -90,6 +91,30 @@ function WorkoutPage() {
   const [completedSessions, setCompletedSessions] = useState<CompletedSession[]>([])
   const [progressiveOverloadData, setProgressiveOverloadData] = useState<any>(null)
   const [selectedExerciseForProgression, setSelectedExerciseForProgression] = useState<string>('all')
+
+  // Input validation errors
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+
+  // Loading states
+  const [isCompletingSession, setIsCompletingSession] = useState(false)
+
+  // Validation function for number inputs
+  const validateNumberInput = (value: number, fieldName: string, min: number = 0, max: number = 10000): boolean => {
+    if (isNaN(value)) {
+      setValidationErrors(prev => ({ ...prev, [fieldName]: 'Invalid input' }))
+      return false
+    }
+    if (value < min) {
+      setValidationErrors(prev => ({ ...prev, [fieldName]: `Value must be at least ${min}` }))
+      return false
+    }
+    if (value > max) {
+      setValidationErrors(prev => ({ ...prev, [fieldName]: `Value must be at most ${max}` }))
+      return false
+    }
+    setValidationErrors(prev => ({ ...prev, [fieldName]: '' }))
+    return true
+  }
 
   // Quick duration presets
   const durationPresets = [
@@ -197,6 +222,14 @@ function WorkoutPage() {
       return
     }
 
+    // Check for validation errors
+    if (Object.values(validationErrors).some(error => error)) {
+      alert('Please fix validation errors before completing the session')
+      return
+    }
+
+    setIsCompletingSession(true)
+
     const durationMinutes = durationMode === 'timer'
       ? Math.max(1, Math.round(timerSeconds / 60))
       : manualDurationUnit === 'hrs'
@@ -218,6 +251,7 @@ function WorkoutPage() {
       setSessionTitle('')
       setTimerSeconds(0)
       setIsTimerRunning(false)
+      setValidationErrors({})
       setRefreshCharts(prev => prev + 1)
       fetchWorkoutHistory()
       fetchCompletedSessions()
@@ -225,6 +259,8 @@ function WorkoutPage() {
     } catch (error: any) {
       console.error('Error completing session:', error)
       alert(`Failed to complete session: ${error.message || 'Unknown error'}`)
+    } finally {
+      setIsCompletingSession(false)
     }
   }
 
@@ -308,45 +344,33 @@ function WorkoutPage() {
     setSearchResults([])
   }
 
+  const handleExerciseCheckboxChange = (exercise: Exercise, checked: boolean) => {
+    if (checked) {
+      setSelectedExercises([...selectedExercises, exercise])
+    } else {
+      setSelectedExercises(selectedExercises.filter(e => e.id !== exercise.id))
+    }
+  }
+
+  const isExerciseSelected = (exercise: Exercise) => {
+    return selectedExercises.some(e => e.id === exercise.id)
+  }
+
+  const isExerciseInSession = (exercise: Exercise) => {
+    return sessionExercises.some(e => e.exerciseId === exercise.id)
+  }
+
   const handleAddExerciseToSession = () => {
-    // If a database exercise is selected, use it
-    if (selectedExercise) {
-      // Auto-fill with previous workout data if available
-      let initialWeight = 0
-      let initialReps = 0
+    // Use selectedExercises (multi-select) if available, otherwise fall back to single selectedExercise
+    const exercisesToAdd = selectedExercises.length > 0 ? selectedExercises : (selectedExercise ? [selectedExercise] : [])
 
-      if (previousWorkout && previousWorkout[selectedExercise.name]) {
-        const prevData = previousWorkout[selectedExercise.name]
-        initialWeight = prevData.weight || 0
-        initialReps = prevData.reps || 0
-      }
+    if (exercisesToAdd.length === 0 && !searchQuery.trim()) {
+      alert('Please select at least one exercise to add')
+      return
+    }
 
-      const newExercise: SessionExercise = {
-        exerciseId: selectedExercise.id,
-        exerciseName: selectedExercise.name,
-        bodyPart: selectedExercise.body_part,
-        target: selectedExercise.target,
-        equipment: selectedExercise.equipment,
-        notes: '',
-        sets: [
-          {
-            id: randomUUID(),
-            setNumber: 1,
-            weight: initialWeight,
-            reps: initialReps,
-            isWarmup: false,
-            completed: false
-          }
-        ]
-      }
-
-      setSessionExercises([...sessionExercises, newExercise])
-      setShowModal(false)
-      setSelectedExercise(null)
-      setSearchQuery('')
-      setSearchResults([])
-    } else if (searchQuery.trim()) {
-      // Add as custom exercise if no database match selected
+    // If no exercises selected but search query exists, add as custom
+    if (exercisesToAdd.length === 0 && searchQuery.trim()) {
       const newExercise: SessionExercise = {
         exerciseId: crypto.randomUUID(),
         exerciseName: searchQuery.trim(),
@@ -369,11 +393,76 @@ function WorkoutPage() {
 
       setSessionExercises([...sessionExercises, newExercise])
       setShowModal(false)
+      setSelectedExercise(null)
+      setSelectedExercises([])
       setSearchQuery('')
       setSearchResults([])
-    } else {
-      alert('Please enter an exercise name or select from the list')
+      return
     }
+
+    // Filter out exercises that are already in session
+    const duplicateExercises: Exercise[] = []
+    const uniqueExercisesToAdd = exercisesToAdd.filter(exercise => {
+      if (isExerciseInSession(exercise)) {
+        duplicateExercises.push(exercise)
+        return false
+      }
+      return true
+    })
+
+    // Show warning for duplicates
+    if (duplicateExercises.length > 0) {
+      const duplicateNames = duplicateExercises.map(e => e.name).join(', ')
+      alert(`The following exercises are already in your session: ${duplicateNames}`)
+    }
+
+    // If no unique exercises to add, return
+    if (uniqueExercisesToAdd.length === 0) {
+      setShowModal(false)
+      setSelectedExercise(null)
+      setSelectedExercises([])
+      setSearchQuery('')
+      setSearchResults([])
+      return
+    }
+
+    const newSessionExercises: SessionExercise[] = uniqueExercisesToAdd.map(exercise => {
+      // Auto-fill with previous workout data if available
+      let initialWeight = 0
+      let initialReps = 0
+
+      if (previousWorkout && previousWorkout[exercise.name]) {
+        const prevData = previousWorkout[exercise.name]
+        initialWeight = prevData.weight || 0
+        initialReps = prevData.reps || 0
+      }
+
+      return {
+        exerciseId: exercise.id,
+        exerciseName: exercise.name,
+        bodyPart: exercise.body_part,
+        target: exercise.target,
+        equipment: exercise.equipment,
+        notes: '',
+        sets: [
+          {
+            id: randomUUID(),
+            setNumber: 1,
+            weight: initialWeight,
+            reps: initialReps,
+            isWarmup: false,
+            completed: false
+          }
+        ]
+      }
+    })
+
+    setSessionExercises([...sessionExercises, ...newSessionExercises])
+    setShowModal(false)
+    setSelectedExercise(null)
+    setSelectedExercises([])
+    setSearchQuery('')
+    setSearchResults([])
   }
 
   const toggleSetComplete = (exerciseIdx: number, _setIdx: number) => {
@@ -496,21 +585,27 @@ function WorkoutPage() {
                       {/* Session Title Selection */}
                       <div className="mb-3">
                         <label className="form-label fw-bold">Session Title</label>
-                        <div className="position-relative">
-                          <Form.Control
-                            type="text"
-                            list="session-title-presets"
-                            placeholder="Select preset or type custom title..."
-                            value={sessionTitle}
-                            onChange={(e) => setSessionTitle(e.target.value)}
-                          />
-                          <datalist id="session-title-presets">
-                            <option value="Push Day" />
-                            <option value="Pull Day" />
-                            <option value="Leg Day" />
-                            <option value="Full Body" />
-                          </datalist>
-                        </div>
+                        <Form.Control
+                          type="text"
+                          list="sessionTitles"
+                          value={sessionTitle}
+                          onChange={(e) => setSessionTitle(e.target.value)}
+                          placeholder="Enter session title or select a preset..."
+                        />
+                        <datalist id="sessionTitles">
+                          <option value="Push Day">Push Day</option>
+                          <option value="Pull Day">Pull Day</option>
+                          <option value="Leg Day">Leg Day</option>
+                          <option value="Full Body">Full Body</option>
+                          <option value="Upper Body">Upper Body</option>
+                          <option value="Lower Body">Lower Body</option>
+                          <option value="Chest & Triceps">Chest & Triceps</option>
+                          <option value="Back & Biceps">Back & Biceps</option>
+                          <option value="Shoulders & Abs">Shoulders & Abs</option>
+                          <option value="HIIT">HIIT</option>
+                          <option value="Cardio">Cardio</option>
+                          <option value="Core">Core</option>
+                        </datalist>
                       </div>
 
                       {/* Duration Tracking */}
@@ -564,10 +659,20 @@ function WorkoutPage() {
                               <Form.Control
                                 type="number"
                                 value={manualDuration}
-                                onChange={(e) => setManualDuration(Number(e.target.value))}
+                                onChange={(e) => {
+                                  const value = Number(e.target.value)
+                                  setManualDuration(value)
+                                  validateNumberInput(value, 'manualDuration', 1, 720)
+                                }}
                                 min="1"
-                                className="flex-grow-1"
+                                max="720"
+                                className={`flex-grow-1 ${validationErrors.manualDuration ? 'border-danger' : ''}`}
                               />
+                              {validationErrors.manualDuration && (
+                                <small className="text-danger" style={{ fontSize: '0.7rem' }}>
+                                  {validationErrors.manualDuration}
+                                </small>
+                              )}
                               <Form.Select
                                 value={manualDurationUnit}
                                 onChange={(e) => setManualDurationUnit(e.target.value as any)}
@@ -646,11 +751,16 @@ function WorkoutPage() {
                                     placeholder="Weight"
                                     value={set.weight || ''}
                                     onChange={(e) => {
+                                      const value = Number(e.target.value)
+                                      validateNumberInput(value, `weight-${exerciseIdx}-${setIdx}`, 0, 2000)
                                       const updated = [...sessionExercises]
-                                      updated[exerciseIdx].sets[setIdx].weight = Number(e.target.value)
+                                      updated[exerciseIdx].sets[setIdx].weight = value
                                       setSessionExercises(updated)
                                     }}
+                                    min="0"
+                                    max="2000"
                                     style={{ width: '80px' }}
+                                    className={validationErrors[`weight-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}
                                   />
                                   <span className="text-muted small">{weightUnit}</span>
                                   <span className="text-muted small">x</span>
@@ -660,12 +770,27 @@ function WorkoutPage() {
                                     placeholder="Reps"
                                     value={set.reps || ''}
                                     onChange={(e) => {
+                                      const value = Number(e.target.value)
+                                      validateNumberInput(value, `reps-${exerciseIdx}-${setIdx}`, 1, 100)
                                       const updated = [...sessionExercises]
-                                      updated[exerciseIdx].sets[setIdx].reps = Number(e.target.value)
+                                      updated[exerciseIdx].sets[setIdx].reps = value
                                       setSessionExercises(updated)
                                     }}
+                                    min="1"
+                                    max="100"
                                     style={{ width: '70px' }}
+                                    className={validationErrors[`reps-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}
                                   />
+                                  {validationErrors[`weight-${exerciseIdx}-${setIdx}`] && (
+                                    <small className="text-danger" style={{ fontSize: '0.7rem' }}>
+                                      {validationErrors[`weight-${exerciseIdx}-${setIdx}`]}
+                                    </small>
+                                  )}
+                                  {validationErrors[`reps-${exerciseIdx}-${setIdx}`] && (
+                                    <small className="text-danger" style={{ fontSize: '0.7rem' }}>
+                                      {validationErrors[`reps-${exerciseIdx}-${setIdx}`]}
+                                    </small>
+                                  )}
                                   <span className="text-muted small">reps</span>
                                   <Form.Check
                                     type="checkbox"
@@ -735,8 +860,16 @@ function WorkoutPage() {
                         <button
                           className="btn btn-font btn-primary btn-size"
                           onClick={handleCompleteSession}
+                          disabled={isCompletingSession}
                         >
-                          Complete Session
+                          {isCompletingSession ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                              Saving...
+                            </>
+                          ) : (
+                            'Complete Session'
+                          )}
                         </button>
                         )}
                       </div>
@@ -1050,17 +1183,29 @@ function WorkoutPage() {
                   autoComplete="off"
                 />
                 {searchResults.length > 0 && (
-                  <div className="position-absolute w-100 bg-white border rounded shadow-lg mt-1" style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
+                  <div className="position-absolute w-100 bg-white border rounded shadow-lg mt-1" style={{ zIndex: 1000, maxHeight: '300px', overflowY: 'auto' }}>
                     {searchResults.map((exercise) => (
                       <div
                         key={exercise.id}
-                        className="p-2 text-fonts search-result-item"
-                        onClick={() => handleExerciseSelect(exercise)}
+                        className="p-2 text-fonts search-result-item d-flex align-items-center"
+                        style={{ cursor: 'pointer' }}
                       >
-                        <div className="fw-bold">{exercise.name}</div>
-                        <small className="text-muted">
-                          {exercise.body_part} • {exercise.target} • {exercise.equipment}
-                        </small>
+                        <Form.Check
+                          type="checkbox"
+                          className="me-2"
+                          checked={isExerciseSelected(exercise)}
+                          onChange={(e) => handleExerciseCheckboxChange(exercise, e.target.checked)}
+                          onClick={(e) => e.stopPropagation()}
+                        />
+                        <div className="flex-grow-1" onClick={() => handleExerciseSelect(exercise)}>
+                          <div className="fw-bold">{exercise.name}</div>
+                          <small className="text-muted">
+                            {exercise.body_part} • {exercise.target} • {exercise.equipment}
+                          </small>
+                          {isExerciseInSession(exercise) && (
+                            <Badge bg="secondary" className="ms-2">Already added to session</Badge>
+                          )}
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -1071,7 +1216,19 @@ function WorkoutPage() {
                   </div>
                 )}
               </div>
-              {selectedExercise && (
+              {selectedExercises.length > 0 && (
+                <div className="mb-3 p-2 bg-light rounded">
+                  <small className="text-fonts text-muted">
+                    <strong>Selected:</strong> {selectedExercises.length} exercise(s)
+                  </small>
+                  <div className="mt-1">
+                    {selectedExercises.map(e => (
+                      <Badge key={e.id} bg="primary" className="me-1 mb-1">{e.name}</Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {selectedExercise && selectedExercises.length === 0 && (
                 <div className="mb-3 p-2 bg-light rounded">
                   <small className="text-fonts text-muted">
                     <strong>Selected:</strong> {selectedExercise.name} ({selectedExercise.body_part} - {selectedExercise.equipment})

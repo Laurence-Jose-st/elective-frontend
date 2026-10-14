@@ -85,7 +85,16 @@ function Login({
             <div className="col-md-6">
               <div className="card shadow bg-gray-900 bg-opacity-30" style={{ backdropFilter: 'blur(10px)', backgroundColor: 'rgba(255, 255, 255, 0.15)', maxWidth: '500px', margin: '0 auto' }}>
                 <div className="card-body p-4">
-                  <h2 className="card-title text-center mb-4" style={{ color: '#fff' }}>{title}</h2>
+                  <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h2 className="card-title text-center mb-0" style={{ color: '#fff' }}>{title}</h2>
+                    <a
+                      href="/"
+                      className="text-decoration-none"
+                      style={{ color: '#fff', fontSize: '0.9rem' }}
+                    >
+                      <i className="bi bi-arrow-left"></i> Back
+                    </a>
+                  </div>
 
                   {error && (
                     <div className="alert alert-danger" role="alert">

@@ -383,6 +383,133 @@ export const mealService = {
   },
 };
 
+// Admin API
+export const adminService = {
+  getAllUsers: async () => {
+    const response = await fetch(`${API_BASE}/admin/users`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch users');
+    }
+
+    return data;
+  },
+
+  toggleUserFlag: async (userId: number, flagged: boolean) => {
+    const response = await fetch(`${API_BASE}/admin/users/${userId}/flag`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ flagged }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to update user');
+    }
+
+    return data;
+  },
+
+  deleteUser: async (userId: number) => {
+    const response = await fetch(`${API_BASE}/admin/users/${userId}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to delete user');
+    }
+
+    return data;
+  },
+
+  sendBroadcast: async (title: string, message: string, targetType: 'all' | 'specific', targetUserId?: number) => {
+    const response = await fetch(`${API_BASE}/admin/broadcast`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ title, message, targetType, targetUserId }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to send broadcast');
+    }
+
+    return data;
+  },
+
+  addFoodItem: async (foodData: { name: string; category?: string; calories: number; protein?: number; carbs?: number; fats?: number; fiber?: number }) => {
+    const response = await fetch(`${API_BASE}/admin/food`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(foodData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to add food item');
+    }
+
+    return data;
+  },
+
+  addExercise: async (exerciseData: { name: string; body_part: string; target: string; equipment: string; gif_url?: string }) => {
+    const response = await fetch(`${API_BASE}/admin/exercises`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(exerciseData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to add exercise');
+    }
+
+    return data;
+  },
+
+  getNotifications: async () => {
+    const response = await fetch(`${API_BASE}/users/notifications`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch notifications');
+    }
+
+    return data;
+  },
+
+  markNotificationRead: async (notificationId: number) => {
+    const response = await fetch(`${API_BASE}/users/notifications/${notificationId}/read`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to mark notification as read');
+    }
+
+    return data;
+  },
+};
+
 // Calculator API (Public - No authentication required)
 export const calculatorService = {
   calculateBmi: async (data: {

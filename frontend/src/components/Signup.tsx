@@ -34,7 +34,16 @@ function Signup({ onSubmit, title = 'Signup' }: SignupProps) {
             <div className="col-md-6 col-lg-4">
                 <div className="card shadow">
                     <div className="card-body p-4">
-                        <h2 className="card-title text-center mb-4">{title}</h2>
+                        <div className="d-flex justify-content-between align-items-center mb-4">
+                            <h2 className="card-title text-center mb-0">{title}</h2>
+                            <a
+                                href="/"
+                                className="text-decoration-none"
+                                style={{ color: '#6c757d', fontSize: '0.9rem' }}
+                            >
+                                <i className="bi bi-arrow-left"></i> Back
+                            </a>
+                        </div>
 
                         {error && (
                             <div className="alert alert-danger" role="alert">
