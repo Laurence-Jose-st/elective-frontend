@@ -6,6 +6,19 @@ import '../App.css'
 import { workoutService } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
 
+// Use web crypto API for UUID generation
+const randomUUID = () => {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  // Fallback for older browsers
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0
+    const v = c === 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
+
 interface Exercise {
   id: string
   name: string
@@ -228,6 +241,48 @@ function WorkoutPage() {
     setIsTimerRunning(false)
   }
 
+  const handleCopySession = (session: any) => {
+    if (!user) {
+      alert('Please login to copy sessions')
+      window.location.href = '/login'
+      return
+    }
+
+    if (session.session_exercises && session.session_exercises.length > 0) {
+      const copiedExercises = session.session_exercises.map((se: any) => ({
+        exerciseId: se.exercise_id,
+        exerciseName: se.exercises?.name || 'Exercise',
+        bodyPart: se.exercises?.body_part || 'custom',
+        target: se.exercises?.target || 'custom',
+        equipment: se.exercises?.equipment || 'custom',
+        notes: se.notes || '',
+        isCustom: !se.exercise_id,
+        sets: se.workout_sets?.map((set: any) => ({
+          id: randomUUID(),
+          setNumber: set.set_number,
+          weight: Number(set.weight),
+          reps: set.reps,
+          isWarmup: set.is_warmup,
+          completed: false
+        })) || [
+          {
+            id: randomUUID(),
+            setNumber: 1,
+            weight: 0,
+            reps: 0,
+            isWarmup: false,
+            completed: false
+          }
+        ]
+      }))
+
+      setSessionExercises(copiedExercises)
+      setSessionTitle(session.name || 'Workout Session')
+      setActiveTab('session')
+      alert(`Copied ${copiedExercises.length} exercises from ${session.name}`)
+    }
+  }
+
   const handleSearch = async (query: string) => {
     setSearchQuery(query)
     if (query.length < 2) {
@@ -275,7 +330,7 @@ function WorkoutPage() {
         notes: '',
         sets: [
           {
-            id: crypto.randomUUID(),
+            id: randomUUID(),
             setNumber: 1,
             weight: initialWeight,
             reps: initialReps,
@@ -302,7 +357,7 @@ function WorkoutPage() {
         isCustom: true,
         sets: [
           {
-            id: crypto.randomUUID(),
+            id: randomUUID(),
             setNumber: 1,
             weight: 0,
             reps: 0,
@@ -639,7 +694,7 @@ function WorkoutPage() {
                                   const updated = [...sessionExercises]
                                   const lastSet = exercise.sets[exercise.sets.length - 1]
                                   const newSet: WorkoutSet = {
-                                    id: crypto.randomUUID(),
+                                    id: randomUUID(),
                                     setNumber: exercise.sets.length + 1,
                                     weight: lastSet ? lastSet.weight : 0,
                                     reps: lastSet ? lastSet.reps : 0,
@@ -711,53 +766,104 @@ function WorkoutPage() {
                       <p className="mb-0">No completed workout sessions yet.</p>
                     </Alert>
                   ) : (
-                    <Accordion defaultActiveKey="0">
-                      {completedSessions.map((session, idx) => (
-                        <Accordion.Item key={session.id} eventKey={idx.toString()}>
-                          <Accordion.Header>
-                            <div className="d-flex justify-content-between align-items-center w-100 me-3">
-                              <div>
-                                <strong>{session.name}</strong>
-                                <small className="text-muted ms-3">{formatDate(session.start_time)}</small>
-                              </div>
-                              <Badge bg="primary">{formatDuration(session.duration_seconds)}</Badge>
-                            </div>
-                          </Accordion.Header>
-                          <Accordion.Body>
-                            {(() => {
-                              const parsedNotes = parseSessionNotes(session.notes)
-                              return parsedNotes && (
-                                <div className="mb-3 p-2 bg-light rounded">
-                                  <small className="text-muted">Notes: {parsedNotes}</small>
-                                </div>
-                              )
-                            })()}
-                            {session.session_exercises && session.session_exercises.length > 0 && (
-                              <div className="list-group">
-                                {session.session_exercises.map((se: any) => (
-                                  <div key={se.id} className="list-group-item">
-                                    <div className="fw-bold">{se.exercises?.name || 'Exercise'}</div>
-                                    <small className="text-muted">
-                                      {se.body_part} • {se.equipment}
-                                    </small>
-                                    {se.workout_sets && se.workout_sets.length > 0 && (
-                                      <div className="mt-2">
-                                        {se.workout_sets.map((set: any) => (
-                                          <div key={set.id} className="small text-muted">
-                                            Set {set.setNumber}: {set.weight} {se.weight_unit || 'lbs'} × {set.reps} reps
-                                            {set.is_warmup && <Badge bg="warning" className="ms-2">Warmup</Badge>}
-                                          </div>
-                                        ))}
-                                      </div>
+                    (() => {
+                      // Group sessions by date
+                      const sessionsByDate: Record<string, any[]> = {}
+                      completedSessions.forEach((session: any) => {
+                        const date = new Date(session.start_time).toDateString()
+                        if (!sessionsByDate[date]) {
+                          sessionsByDate[date] = []
+                        }
+                        sessionsByDate[date].push(session)
+                      })
+
+                      // Sort dates descending (newest first)
+                      const sortedDates = Object.keys(sessionsByDate).sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+
+                      return (
+                        <Accordion className="col-12" defaultActiveKey={sortedDates[0]}>
+                          {sortedDates.map((date) => (
+                            <Accordion.Item eventKey={date} key={date}>
+                              <Accordion.Header>
+                                <div className="d-flex justify-content-between align-items-center w-100">
+                                  <span>
+                                    <strong>
+                                      {new Date(date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                    </strong>
+                                    {date === new Date().toDateString() && (
+                                      <span className="badge bg-primary ms-2">Today</span>
                                     )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </Accordion.Body>
-                        </Accordion.Item>
-                      ))}
-                    </Accordion>
+                                    <span className="text-muted ms-3 small">
+                                      {sessionsByDate[date].length} session{sessionsByDate[date].length !== 1 ? 's' : ''}
+                                    </span>
+                                  </span>
+                                </div>
+                              </Accordion.Header>
+                              <Accordion.Body>
+                                <Accordion flush>
+                                  {sessionsByDate[date].map((session: any, idx: number) => (
+                                    <Accordion.Item eventKey={`${date}-${idx}`} key={session.id}>
+                                      <Accordion.Header className="bg-light border">
+                                        <div className="d-flex justify-content-between align-items-center w-100 me-3">
+                                          <div>
+                                            <strong>{session.name}</strong>
+                                            <small className="text-muted ms-3">
+                                              {new Date(session.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                                            </small>
+                                          </div>
+                                          <Badge bg="primary">{formatDuration(session.duration_seconds)}</Badge>
+                                        </div>
+                                      </Accordion.Header>
+                                      <Accordion.Body>
+                                        {(() => {
+                                          const parsedNotes = parseSessionNotes(session.notes)
+                                          return parsedNotes && (
+                                            <div className="mb-3 p-2 bg-light rounded">
+                                              <small className="text-muted">Notes: {parsedNotes}</small>
+                                            </div>
+                                          )
+                                        })()}
+                                        {session.session_exercises && session.session_exercises.length > 0 && (
+                                          <div className="list-group">
+                                            {session.session_exercises.map((se: any) => (
+                                              <div key={se.id} className="list-group-item">
+                                                <div className="fw-bold">{se.exercises?.name || 'Exercise'}</div>
+                                                <small className="text-muted">
+                                                  {se.body_part} • {se.equipment}
+                                                </small>
+                                                {se.workout_sets && se.workout_sets.length > 0 && (
+                                                  <div className="mt-2">
+                                                    {se.workout_sets.map((set: any) => (
+                                                      <div key={set.id} className="small text-muted">
+                                                        Set {set.setNumber}: {set.weight} {se.weight_unit || 'lbs'} × {set.reps} reps
+                                                        {set.is_warmup && <Badge bg="warning" className="ms-2">Warmup</Badge>}
+                                                      </div>
+                                                    ))}
+                                                  </div>
+                                                )}
+                                              </div>
+                                            ))}
+                                          </div>
+                                        )}
+                                        <div className="mt-3 pt-3 border-top">
+                                          <Button
+                                            variant="outline-primary"
+                                            size="sm"
+                                            onClick={() => handleCopySession(session)}
+                                          >
+                                            <i className="bi bi-plus-circle"></i> Copy to Today
+                                          </Button>
+                                        </div>
+                                      </Accordion.Body>
+                                    </Accordion.Item>
+                                  ))}
+                                </Accordion>
+                              </Accordion.Body>
+                            </Accordion.Item>
+                          ))}
+                        </Accordion>
+                      )
+                    })()
                   )}
                 </div>
               </div>
