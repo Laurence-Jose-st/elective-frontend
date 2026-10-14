@@ -512,38 +512,110 @@ export const workoutController = {
 
       const { exerciseName } = req.query;
 
-      // Get workout logs for this exercise
+      // Get workout logs for this exercise or all exercises
       const logs = await prisma.workout_logs.findMany({
         where: {
           user_id: parseInt(userId),
-          ...(exerciseName && { exercise_name: { contains: exerciseName, mode: 'insensitive' } })
+          ...(exerciseName && exerciseName !== 'all' && { exercise_name: { contains: exerciseName, mode: 'insensitive' } })
         },
         orderBy: {
           created_at: 'desc'
         },
-        take: 10
+        take: 50
       });
 
-      // Calculate progressive overload metrics
+      // Group by exercise name for "All Exercises" view
+      const exerciseGroups = {};
+      logs.forEach(log => {
+        if (!exerciseGroups[log.exercise_name]) {
+          exerciseGroups[log.exercise_name] = [];
+        }
+        exerciseGroups[log.exercise_name].push(log);
+      });
+
+      // Calculate metrics and improvements
       const metrics = logs.map(log => ({
         date: log.created_at,
+        exerciseName: log.exercise_name,
         weight: log.weight,
         reps: log.reps,
         sets: log.sets,
         volume: log.weight * log.reps * log.sets
       }));
 
-      // Calculate improvements
+      // Calculate improvements (only for specific exercise or per exercise)
       const improvements = [];
-      for (let i = 0; i < metrics.length - 1; i++) {
-        const current = metrics[i];
-        const previous = metrics[i + 1];
-        improvements.push({
-          date: current.date,
-          weightChange: current.weight - previous.weight,
-          volumeChange: current.volume - previous.volume,
-          repsChange: current.reps - previous.reps
+      if (exerciseName && exerciseName !== 'all') {
+        for (let i = 0; i < metrics.length - 1; i++) {
+          const current = metrics[i];
+          const previous = metrics[i + 1];
+          improvements.push({
+            date: current.date,
+            exerciseName: current.exerciseName,
+            weightChange: current.weight - previous.weight,
+            volumeChange: current.volume - previous.volume,
+            repsChange: current.reps - previous.reps
+          });
+        }
+      } else {
+        // For "All Exercises", calculate improvements per exercise
+        Object.keys(exerciseGroups).forEach(exName => {
+          const exLogs = exerciseGroups[exName];
+          for (let i = 0; i < exLogs.length - 1; i++) {
+            const current = exLogs[i];
+            const previous = exLogs[i + 1];
+            improvements.push({
+              date: current.created_at,
+              exerciseName: exName,
+              weightChange: current.weight - previous.weight,
+              volumeChange: (current.weight * current.reps * current.sets) - (previous.weight * previous.reps * previous.sets),
+              repsChange: current.reps - previous.reps
+            });
+          }
         });
+      }
+
+      // Calculate current PR
+      let currentPR = null;
+      if (exerciseName && exerciseName !== 'all') {
+        // For specific exercise, get the PR
+        if (metrics.length > 0) {
+          currentPR = metrics[0];
+        }
+      } else {
+        // For "All Exercises", find the overall max weight
+        let maxWeight = 0;
+        let maxVolume = 0;
+        let maxExercise = '';
+        let maxReps = 0;
+        let maxSets = 0;
+
+        Object.keys(exerciseGroups).forEach(exName => {
+          const exLogs = exerciseGroups[exName];
+          exLogs.forEach(log => {
+            if (log.weight > maxWeight) {
+              maxWeight = log.weight;
+              maxExercise = exName;
+              maxReps = log.reps;
+              maxSets = log.sets;
+            }
+            const volume = log.weight * log.reps * log.sets;
+            if (volume > maxVolume) {
+              maxVolume = volume;
+            }
+          });
+        });
+
+        if (maxExercise) {
+          currentPR = {
+            date: new Date(),
+            exerciseName: maxExercise,
+            weight: maxWeight,
+            reps: maxReps,
+            sets: maxSets,
+            volume: maxVolume
+          };
+        }
       }
 
       res.json({
@@ -551,7 +623,7 @@ export const workoutController = {
         data: {
           metrics,
           improvements,
-          currentPR: metrics.length > 0 ? metrics[0] : null
+          currentPR
         }
       });
     } catch (error) {

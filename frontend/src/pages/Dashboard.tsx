@@ -23,10 +23,12 @@ function Dashboard() {
     fats: 0,
     fiber: 0
   })
+  const [progressiveData, setProgressiveData] = useState<any>(null)
 
   useEffect(() => {
     fetchDailyStats()
     fetchNutritionStats()
+    fetchProgressiveData()
   }, [])
 
   const fetchDailyStats = async () => {
@@ -86,6 +88,17 @@ function Dashboard() {
     }
   }
 
+  const fetchProgressiveData = async () => {
+    if (!user) return
+    try {
+      // Fetch all exercises data for dashboard
+      const response = await workoutService.getProgressiveOverload('all')
+      setProgressiveData(response.data)
+    } catch (error) {
+      console.error('Error fetching progressive data:', error)
+    }
+  }
+
   return (
     <>
       <div className="container-fluid py-3 px-5">
@@ -108,7 +121,7 @@ function Dashboard() {
 
             <div className="card border-0 mb-4">
               <div className="card-body">
-                <Carousel interval={5000} controls={false}>
+                <Carousel interval={5000} controls={true}>
                   <Carousel.Item>
                     <div className="p-4 bg-light rounded-0" style={{ height: '350px' }}>
                       <h3 className="text-center mb-4 finlandica-text-regular">Weekly Performance</h3>
@@ -117,9 +130,84 @@ function Dashboard() {
                   </Carousel.Item>
 
                   <Carousel.Item>
-                    <div className="p-4 text-center bg-primary text-white rounded-0" style={{ height: '350px' }}>
-                      <h3>Workout</h3>
-                      <p>Updates goes here.</p>
+                    <div className="p-4 bg-primary text-white rounded-0" style={{ height: '350px' }}>
+                      <h3 className="text-center mb-4">Workout Progress</h3>
+                      {progressiveData ? (
+                        <div className="row g-3">
+                          {/* Card 1: Personal Record */}
+                          <div className="col-4">
+                            <div className="p-2 bg-white bg-opacity-10 rounded border border-white border-opacity-25 h-100">
+                              <h6 className="fw-bold mb-2 small">🏆 PR</h6>
+                              {progressiveData.currentPR && (
+                                <>
+                                  {progressiveData.currentPR.exerciseName && (
+                                    <p className="mb-1 text-white-50" style={{ fontSize: '0.75rem' }}>{progressiveData.currentPR.exerciseName}</p>
+                                  )}
+                                  <p className="mb-1 fw-bold" style={{ fontSize: '1rem' }}>
+                                    {progressiveData.currentPR.weight} lbs × {progressiveData.currentPR.reps} reps
+                                  </p>
+                                  <small className="text-white-50" style={{ fontSize: '0.7rem' }}>Vol: {progressiveData.currentPR.volume} lbs</small>
+                                </>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Card 2: Next Goal */}
+                          <div className="col-4">
+                            <div className="p-2 bg-white bg-opacity-10 rounded border border-white border-opacity-25 h-100">
+                              <h6 className="fw-bold mb-2 small">🎯 Next Goal</h6>
+                              {progressiveData.improvements && progressiveData.improvements.length > 0 ? (
+                                (() => {
+                                  const weightChange = progressiveData.improvements[0].weightChange
+                                  if (weightChange === 0) {
+                                    return (
+                                      <>
+                                        <p className="mb-1" style={{ fontSize: '0.9rem' }}>Increase reps</p>
+                                        <small className="text-white-50" style={{ fontSize: '0.7rem' }}>at current weight</small>
+                                      </>
+                                    )
+                                  } else {
+                                    return (
+                                      <>
+                                        <p className="mb-1 fw-bold" style={{ fontSize: '1rem' }}>
+                                          {weightChange >= 0 ? '+' : ''}{weightChange} lbs
+                                        </p>
+                                        <small className="text-white-50" style={{ fontSize: '0.7rem' }}>progression</small>
+                                      </>
+                                    )
+                                  }
+                                })()
+                              ) : (
+                                <p className="mb-0" style={{ fontSize: '0.8rem' }}>Start logging workouts</p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Card 3: Recent Session */}
+                          <div className="col-4">
+                            <div className="p-2 bg-white bg-opacity-10 rounded border border-white border-opacity-25 h-100">
+                              <h6 className="fw-bold mb-2 small">� Recent</h6>
+                              {progressiveData.metrics && progressiveData.metrics.length > 0 ? (
+                                <>
+                                  {progressiveData.metrics[0].exerciseName && (
+                                    <p className="mb-1 text-white-50" style={{ fontSize: '0.75rem' }}>{progressiveData.metrics[0].exerciseName}</p>
+                                  )}
+                                  <p className="mb-1 fw-bold" style={{ fontSize: '0.9rem' }}>
+                                    {progressiveData.metrics[0].weight} lbs × {progressiveData.metrics[0].reps} reps
+                                  </p>
+                                  <small className="text-white-50" style={{ fontSize: '0.7rem' }}>
+                                    {progressiveData.metrics[0].sets} sets × {progressiveData.metrics[0].volume} lbs vol
+                                  </small>
+                                </>
+                              ) : (
+                                <p className="mb-0" style={{ fontSize: '0.8rem' }}>No sessions yet</p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="mt-4 text-center">Start logging workouts to see your progress!</p>
+                      )}
                     </div>
                   </Carousel.Item>
                   <Carousel.Item>
