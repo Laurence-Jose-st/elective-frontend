@@ -28,17 +28,33 @@ function Navigation() {
             </NavLink>
           </li>
         ))}
-        <li className="nav-item">
-          <button
-            className="nav-link text-dark"
-            onClick={handleShow}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', height: '100%' }}
-          >
-            <span style={{ fontFamily: 'bootstrap-icons', lineHeight: '1', color: 'black', fontSize: '2rem', position: 'relative', top: '-1px' }}>
-              {"\uF4D7"}
-            </span>
-          </button>
-        </li>
+
+        {!user ? (
+          <>
+            <li className="nav-item">
+              <NavLink to="/login" className="nav-link text-dark">
+                Login
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink to="/signup" className="nav-link text-dark">
+                Sign Up
+              </NavLink>
+            </li>
+          </>
+        ) : (
+          <li className="nav-item">
+            <button
+              className="nav-link text-dark"
+              onClick={handleShow}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', height: '100%' }}
+            >
+              <span style={{ fontFamily: 'bootstrap-icons', lineHeight: '1', color: 'black', fontSize: '2rem', position: 'relative', top: '-1px' }}>
+                {"\uF4D7"}
+              </span>
+            </button>
+          </li>
+        )}
       </ul>
 
       <Offcanvas show={showDrawer} onHide={handleClose} placement="end">

@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
-import Navigation from '../components/Navigation'
 import WorkoutCharts from '../components/WorkoutCharts'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { Modal } from 'react-bootstrap'
+import { Modal, Alert } from 'react-bootstrap'
 import '../App.css'
 import { workoutService } from '../services/api'
+import { useAuth } from '../contexts/AuthContext'
 
 interface Exercise {
   id: string
@@ -23,6 +23,7 @@ interface Session {
 }
 
 function WorkoutPage() {
+  const { user } = useAuth()
   const [showModal, setShowModal] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Exercise[]>([])
@@ -65,6 +66,12 @@ function WorkoutPage() {
   }
 
   const handleStartSession = async () => {
+    if (!user) {
+      alert('Please login to start a workout session')
+      window.location.href = '/login'
+      return
+    }
+
     try {
       const response = await workoutService.startSession('Workout Session')
       setActiveSession(response.data)
@@ -200,7 +207,6 @@ function WorkoutPage() {
           </div>
           <div className="col-8">
             <div className="row">
-              <Navigation />
             </div>
           </div>
         </div>
@@ -214,10 +220,21 @@ function WorkoutPage() {
           <div className="col-12">
             <div className="card border-0" style={{ minHeight: '200px' }}>
               <div className="card-body d-flex flex-column">
-                {!activeSession ? (
+                {!user ? (
+                  <Alert variant="warning" className="text-center">
+                    <h5>Guest Mode</h5>
+                    <p className="mb-2">You can view workout history, but logging new workouts requires an account.</p>
+                    <button
+                      className="btn btn-primary btn-sm"
+                      onClick={() => window.location.href = '/login'}
+                    >
+                      Login to Log Workouts
+                    </button>
+                  </Alert>
+                ) : !activeSession ? (
                   <>
                     <button
-                      className="btn btn-primary w-25 btn-font align-self-center" 
+                      className="btn btn-primary w-25 btn-font align-self-center"
                       onClick={handleStartSession}
                     >
                       Start Session

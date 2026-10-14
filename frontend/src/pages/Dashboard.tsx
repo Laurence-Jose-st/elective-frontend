@@ -1,5 +1,4 @@
 import 'bootstrap/dist/css/bootstrap.min.css'
-import Navigation from '../components/Navigation'
 import { Carousel } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import WorkoutCharts from '../components/WorkoutCharts'
@@ -51,6 +50,7 @@ function Dashboard() {
       setDailyStats(stats)
     } catch (error) {
       console.error('Error fetching daily stats:', error)
+      // Keep stats at 0 for guests
     }
   }
 
@@ -82,6 +82,7 @@ function Dashboard() {
       })
     } catch (error) {
       console.error('Error fetching nutrition stats:', error)
+      // Keep stats at 0 for guests
     }
   }
 
@@ -94,7 +95,6 @@ function Dashboard() {
           </div>
           <div className="col-8">
             <div className="row">
-              <Navigation />
             </div>
           </div>
         </div>

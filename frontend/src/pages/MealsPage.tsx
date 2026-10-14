@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import Navigation from '../components/Navigation'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { Modal } from 'react-bootstrap'
+import { Modal, Alert } from 'react-bootstrap'
 import MealsChart from '../components/MealsChart'
 import { mealService } from '../services/api'
+import { useAuth } from '../contexts/AuthContext'
 import '../App.css'
 
 interface FoodItem {
@@ -18,6 +18,7 @@ interface FoodItem {
 }
 
 function MealsPage() {
+    const { user } = useAuth()
     const [showModal, setShowModal] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [searchResults, setSearchResults] = useState<FoodItem[]>([])
@@ -53,6 +54,15 @@ function MealsPage() {
             calculateDailyTotals(meals)
         } catch (error) {
             console.error('Error fetching meals:', error)
+            // Keep empty for guests
+            setLoggedMeals([])
+            setDailyTotals({
+                calories: 0,
+                protein: 0,
+                carbs: 0,
+                fats: 0,
+                fiber: 0
+            })
         }
     }
 
@@ -130,6 +140,12 @@ function MealsPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
 
+        if (!user) {
+            alert('Please login to log meals')
+            window.location.href = '/login'
+            return
+        }
+
         const mealData = {
             mealName: selectedFood?.name || 'Custom Meal',
             mealType: mealCategory,
@@ -162,6 +178,12 @@ function MealsPage() {
     }
 
     const handleDeleteMeal = async (id: number) => {
+        if (!user) {
+            alert('Please login to delete meals')
+            window.location.href = '/login'
+            return
+        }
+
         try {
             await mealService.deleteMeal(id)
             await fetchLoggedMeals()
@@ -179,7 +201,6 @@ function MealsPage() {
                     </div>
                     <div className="col-8">
                         <div className="row">
-                            <Navigation />
                         </div>
                     </div>
                 </div>
@@ -189,13 +210,25 @@ function MealsPage() {
                 <div className="row">
                     <div className="col-12 ">
                         <h2 className="mb-4">Nutrition Overview</h2>
-                        <MealsChart
-                            calories={dailyTotals.calories}
-                            protein={dailyTotals.protein}
-                            carbs={dailyTotals.carbs}
-                            fats={dailyTotals.fats}
-                            fiber={dailyTotals.fiber}
-                        />
+                        {user ? (
+                            <MealsChart
+                                calories={dailyTotals.calories}
+                                protein={dailyTotals.protein}
+                                carbs={dailyTotals.carbs}
+                                fats={dailyTotals.fats}
+                                fiber={dailyTotals.fiber}
+                            />
+                        ) : (
+                            <div className="card border-0">
+                                <div className="card-body text-center py-5">
+                                    <h3 className="mb-3">{dailyTotals.calories} kcal</h3>
+                                    <p className="text-muted">Total Calories Today</p>
+                                    <Alert variant="info" className="mt-3">
+                                        <small>Detailed macro breakdown (Protein, Carbs, Fats, Fiber) is available for registered users only.</small>
+                                    </Alert>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -207,15 +240,28 @@ function MealsPage() {
             <div className="container mt-4">
                 <div className="card">
                     <div className="card-body">
+                        {!user && (
+                            <Alert variant="info" className="mb-3">
+                                <h6>Guest Mode</h6>
+                                <p className="mb-0">You can search for food items and view calorie information. To log meals and track detailed macros, please login or sign up.</p>
+                            </Alert>
+                        )}
                         <div className="row mb-3">
                             <div className="col-6">
                                 <h2>Meal Diary</h2>
                             </div>
                             <div className="col-6 text-end">
-                                <button className="btn btn-primary d-inline-flex align-items-center gap-2" onClick={() => setShowModal(true)}>
-                                    <i className="bi bi-plus-lg"></i>
-                                    <span>Log Meal</span>
-                                </button>
+                                {user ? (
+                                    <button className="btn btn-primary d-inline-flex align-items-center gap-2" onClick={() => setShowModal(true)}>
+                                        <i className="bi bi-plus-lg"></i>
+                                        <span>Log Meal</span>
+                                    </button>
+                                ) : (
+                                    <button className="btn btn-primary d-inline-flex align-items-center gap-2" onClick={() => window.location.href = '/login'}>
+                                        <i className="bi bi-plus-lg"></i>
+                                        <span>Log Meal</span>
+                                    </button>
+                                )}
                             </div>
                         </div>
 
@@ -239,15 +285,25 @@ function MealsPage() {
                                                         <div>
                                                             <strong>{meal.food_name}</strong>
                                                             <small className="text-fonts text-muted d-block">
-                                                                {meal.calories} kcal • P: {meal.protein}g • C: {meal.carbs}g • F: {meal.fats}g
+                                                                {user ? (
+                                                                    <>
+                                                                        {meal.calories} kcal • P: {meal.protein}g • C: {meal.carbs}g • F: {meal.fats}g
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        {meal.calories} kcal
+                                                                    </>
+                                                                )}
                                                             </small>
                                                         </div>
-                                                        <button
-                                                            className="btn btn-sm btn-outline-danger"
-                                                            onClick={() => handleDeleteMeal(meal.id)}
-                                                        >
-                                                            <i className="bi bi-trash"></i>
-                                                        </button>
+                                                        {user && (
+                                                            <button
+                                                                className="btn btn-sm btn-outline-danger"
+                                                                onClick={() => handleDeleteMeal(meal.id)}
+                                                            >
+                                                                <i className="bi bi-trash"></i>
+                                                            </button>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>

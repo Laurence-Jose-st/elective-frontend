@@ -13,7 +13,7 @@ function SignupPage() {
       // Use AuthContext login function
       login(response.data.token, response.data.user)
 
-      window.location.href = '/dashboard';
+      window.location.href = '/';
     } catch (error) {
       console.error('Signup error:', error)
       throw error
