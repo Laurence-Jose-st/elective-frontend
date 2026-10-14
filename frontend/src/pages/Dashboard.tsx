@@ -24,6 +24,8 @@ function Dashboard() {
     fiber: 0
   })
   const [progressiveData, setProgressiveData] = useState<any>(null)
+  const [todayMeals, setTodayMeals] = useState<any[]>([])
+  const [todayWorkouts, setTodayWorkouts] = useState<any[]>([])
 
   useEffect(() => {
     fetchDailyStats()
@@ -36,11 +38,13 @@ function Dashboard() {
       const workouts = await workoutService.getWorkouts()
       const today = new Date().toDateString()
 
-      const todayWorkouts = workouts.filter((w: any) => {
+      const todayWorkoutsFiltered = workouts.filter((w: any) => {
         return new Date(w.created_at).toDateString() === today
       })
 
-      const stats = todayWorkouts.reduce((acc: any, w: any) => {
+      setTodayWorkouts(todayWorkoutsFiltered)
+
+      const stats = todayWorkoutsFiltered.reduce((acc: any, w: any) => {
         acc.exercises += 1
         acc.totalReps += w.reps || 0
         acc.totalWeight += w.weight || 0
@@ -62,11 +66,13 @@ function Dashboard() {
       const meals = response.data || []
       const today = new Date().toDateString()
 
-      const todayMeals = meals.filter((m: any) => {
+      const todayMealsFiltered = meals.filter((m: any) => {
         return new Date(m.created_at).toDateString() === today
       })
 
-      const stats = todayMeals.reduce((acc: any, m: any) => {
+      setTodayMeals(todayMealsFiltered)
+
+      const stats = todayMealsFiltered.reduce((acc: any, m: any) => {
         acc.calories += m.calories || 0
         acc.protein += m.protein || 0
         acc.carbs += m.carbs || 0
@@ -211,9 +217,26 @@ function Dashboard() {
                     </div>
                   </Carousel.Item>
                   <Carousel.Item>
-                    <div className="p-4 text-center bg-primary text-white rounded-0" style={{ height: '350px' }}>
-                      <h3>Meals</h3>
-                      <p>Updates goes here.</p>
+                    <div className="p-4 bg-primary text-white rounded-0" style={{ height: '350px' }}>
+                      <h3 className="text-center mb-4">Today's Meal Diary</h3>
+                      {todayMeals.length > 0 ? (
+                        <div className="row g-2" style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                          {todayMeals.slice(0, 6).map((meal: any, idx: number) => (
+                            <div key={idx} className="col-6">
+                              <div className="p-2 bg-white bg-opacity-10 rounded border border-white border-opacity-25">
+                                <p className="mb-1 fw-bold" style={{ fontSize: '0.8rem' }}>{meal.food_name}</p>
+                                <small className="text-white-50" style={{ fontSize: '0.7rem' }}>
+                                  {meal.meal_type} • {meal.calories} kcal
+                                </small>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="mt-4 text-center" style={{ fontSize: '0.9rem' }}>
+                          No meals logged today. Start tracking your nutrition!
+                        </p>
+                      )}
                     </div>
                   </Carousel.Item>
                 </Carousel>
@@ -307,7 +330,23 @@ function Dashboard() {
             <div className="card mb-4">
               <div className="card-body">
                 <h5 className="card-title mb-4 finlandica-text-regular">Target Progress</h5>
-                <p className="card-text">Card content goes here.</p>
+                {todayWorkouts.length === 0 ? (
+                  <div className="alert alert-info mb-0">
+                    <h6 className="alert-heading">🏋️ Ready to Lift?</h6>
+                    <p className="mb-0">You haven't logged a workout today. Start your session now to track your progress!</p>
+                    <button
+                      className="btn btn-primary btn-sm mt-2"
+                      onClick={() => window.location.href = '/workout'}
+                    >
+                      Start Workout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="alert alert-success mb-0">
+                    <h6 className="alert-heading">✅ Great Job!</h6>
+                    <p className="mb-0">You've logged {todayWorkouts.length} workout(s) today. Keep up the momentum!</p>
+                  </div>
+                )}
               </div>
             </div>
 

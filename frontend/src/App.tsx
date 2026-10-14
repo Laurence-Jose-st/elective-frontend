@@ -2,6 +2,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import LoginPage from './pages/LoginPage'
 import Dashboard from './pages/Dashboard'
 import SignupPage from './pages/SignupPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
+import AdminPage from './pages/AdminPage'
+import AdminRoute from './components/AdminRoute'
+import UserRoute from './components/UserRoute'
 import WorkoutPage from './pages/WorkoutPage'
 import MealsPage from './pages/MealsPage'
 import CalculatorPage from './pages/CalculatorPage'
@@ -41,20 +46,35 @@ function App() {
           } />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/admin" element={
+            <AdminRoute>
+              <MainLayout>
+                <AdminPage />
+              </MainLayout>
+            </AdminRoute>
+          } />
           <Route path="/dashboard" element={
-            <MainLayout>
-              <Dashboard />
-            </MainLayout>
+            <UserRoute>
+              <MainLayout>
+                <Dashboard />
+              </MainLayout>
+            </UserRoute>
           } />
           <Route path="/workout" element={
-            <MainLayout>
-              <WorkoutPage />
-            </MainLayout>
+            <UserRoute>
+              <MainLayout>
+                <WorkoutPage />
+              </MainLayout>
+            </UserRoute>
           } />
           <Route path="/meals" element={
-            <MainLayout>
-              <MealsPage />
-            </MainLayout>
+            <UserRoute>
+              <MainLayout>
+                <MealsPage />
+              </MainLayout>
+            </UserRoute>
           } />
           <Route path="/calculator" element={
             <MainLayout>

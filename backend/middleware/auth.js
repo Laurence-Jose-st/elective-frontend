@@ -8,14 +8,27 @@ export const JWT_EXPIRES_IN = '7d';
  * Generate a cryptographically signed JWT token for an authenticated user
  */
 export function generateToken(user) {
-  const payload = {
-    userId: user._id || user.id,
-    email: user.email,
-    role: user.role,
-    username: user.username,
-  };
+  try {
+    if (!JWT_SECRET) {
+      console.error('JWT_SECRET is not configured');
+      throw new Error('JWT_SECRET environment variable is not set');
+    }
 
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+    const payload = {
+      userId: user.id, // Use actual database ID
+      email: user.email,
+      role: user.role,
+      username: user.username,
+    };
+
+    console.log('Generating token for user:', payload.userId);
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+    console.log('Token generated successfully');
+    return token;
+  } catch (error) {
+    console.error('Token generation error:', error);
+    throw new Error('Failed to generate authentication token');
+  }
 }
 
 /**
@@ -67,6 +80,7 @@ export async function verifyToken(req, res, next) {
       ...decoded,
       role: user.role,
       isFlagged: user.flagged,
+      userId: decoded.userId // Use the userId from the token payload
     };
 
     next();

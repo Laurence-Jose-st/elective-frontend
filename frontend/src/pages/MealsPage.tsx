@@ -20,6 +20,7 @@ interface FoodItem {
 function MealsPage() {
     const { user } = useAuth()
     const [showModal, setShowModal] = useState(false)
+    const [showLoginPrompt, setShowLoginPrompt] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [searchResults, setSearchResults] = useState<FoodItem[]>([])
     const [selectedFood, setSelectedFood] = useState<FoodItem | null>(null)
@@ -53,6 +54,31 @@ function MealsPage() {
         fats: 0,
         fiber: 0
     })
+
+    // Loading states
+    const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isUpdating, setIsUpdating] = useState(false)
+
+    // Input validation errors
+    const [validationErrors, setValidationErrors] = useState<Record<string, string>>({})
+
+    // Validation function for number inputs
+    const validateNumberInput = (value: number, fieldName: string, min: number = 0, max: number = 10000): boolean => {
+        if (isNaN(value)) {
+            setValidationErrors(prev => ({ ...prev, [fieldName]: 'Invalid input' }))
+            return false
+        }
+        if (value < min) {
+            setValidationErrors(prev => ({ ...prev, [fieldName]: `Value must be at least ${min}` }))
+            return false
+        }
+        if (value > max) {
+            setValidationErrors(prev => ({ ...prev, [fieldName]: `Value must be at most ${max}` }))
+            return false
+        }
+        setValidationErrors(prev => ({ ...prev, [fieldName]: '' }))
+        return true
+    }
 
     useEffect(() => {
         fetchLoggedMeals()
@@ -166,6 +192,14 @@ function MealsPage() {
             return
         }
 
+        // Check for validation errors
+        if (Object.values(validationErrors).some(error => error)) {
+            alert('Please fix validation errors before submitting')
+            return
+        }
+
+        setIsSubmitting(true)
+
         // Use search query as meal name if no food selected (custom food)
         const mealName = selectedFood?.name || searchQuery.trim() || 'Custom Meal'
 
@@ -193,10 +227,13 @@ function MealsPage() {
                 fats: 0,
                 fiber: 0
             })
+            setValidationErrors({})
             await fetchLoggedMeals()
         } catch (error) {
             console.error('Error logging meal:', error)
             alert('Failed to log meal')
+        } finally {
+            setIsSubmitting(false)
         }
     }
 
@@ -249,6 +286,14 @@ function MealsPage() {
             return
         }
 
+        // Check for validation errors
+        if (Object.values(validationErrors).some(error => error)) {
+            alert('Please fix validation errors before submitting')
+            return
+        }
+
+        setIsUpdating(true)
+
         const mealData = {
             mealName: editFormValues.mealName,
             mealType: editFormValues.mealType,
@@ -263,11 +308,14 @@ function MealsPage() {
             await mealService.updateMeal(editingMeal.id, mealData)
             setShowEditModal(false)
             setEditingMeal(null)
+            setValidationErrors({})
             await fetchLoggedMeals()
             alert('Meal updated successfully!')
         } catch (error) {
             console.error('Error updating meal:', error)
             alert('Failed to update meal')
+        } finally {
+            setIsUpdating(false)
         }
     }
 
@@ -351,9 +399,9 @@ function MealsPage() {
                                         <span>Log Meal</span>
                                     </button>
                                 ) : (
-                                    <button className="btn btn-primary d-inline-flex align-items-center gap-2" onClick={() => window.location.href = '/login'}>
+                                    <button className="btn btn-primary d-inline-flex align-items-center gap-2" onClick={() => setShowLoginPrompt(true)}>
                                         <i className="bi bi-plus-lg"></i>
-                                        <span>Log Meal</span>
+                                        <span>Login to Log Meals</span>
                                     </button>
                                 )}
                             </div>
@@ -612,14 +660,22 @@ function MealsPage() {
                                             <div className="d-flex gap-2 align-items-center">
                                                 <input
                                                     type="number"
-                                                    className="form-control border-0 border-bottom"
+                                                    className={`form-control border-0 border-bottom ${validationErrors.portionWeight ? 'border-danger' : ''}`}
                                                     value={formValues.portionWeight}
-                                                    onChange={(e) => handlePortionChange(Number(e.target.value))}
+                                                    onChange={(e) => {
+                                                        const value = Number(e.target.value)
+                                                        validateNumberInput(value, 'portionWeight', 1, 10000)
+                                                        handlePortionChange(value)
+                                                    }}
+                                                    min="1"
+                                                    max="10000"
                                                     style={{ width: '150px' }}
                                                 />
                                                 <span>grams</span>
                                             </div>
-
+                                            {validationErrors.portionWeight && (
+                                                <small className="text-danger">{validationErrors.portionWeight}</small>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
@@ -649,68 +705,115 @@ function MealsPage() {
                                         <label htmlFor="calories" className="form-label" style={{ color: 'purple' }}>Total Calories (kcal)</label>
                                         <input
                                             type="number"
-                                            className="form-control border-0 border-bottom"
+                                            className={`form-control border-0 border-bottom ${validationErrors.calories ? 'border-danger' : ''}`}
                                             style={{ color: 'purple' }}
                                             id="calories"
                                             value={formValues.calories}
-                                            onChange={(e) => setFormValues({ ...formValues, calories: Number(e.target.value) })}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                validateNumberInput(value, 'calories', 0, 50000)
+                                                setFormValues({ ...formValues, calories: value })
+                                            }}
+                                            min="0"
+                                            max="50000"
                                             readOnly={!!selectedFood}
                                         />
+                                        {validationErrors.calories && <small className="text-danger">{validationErrors.calories}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
                                         <label htmlFor="protein" className="form-label" style={{ color: 'blue' }}>Protein (g)</label>
                                         <input
                                             type="number"
-                                            className="form-control border-0 border-bottom"
+                                            className={`form-control border-0 border-bottom ${validationErrors.protein ? 'border-danger' : ''}`}
                                             style={{ color: 'blue' }}
                                             id="protein"
                                             value={formValues.protein}
-                                            onChange={(e) => setFormValues({ ...formValues, protein: Number(e.target.value) })}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                validateNumberInput(value, 'protein', 0, 5000)
+                                                setFormValues({ ...formValues, protein: value })
+                                            }}
+                                            min="0"
+                                            max="5000"
                                             readOnly={!!selectedFood}
                                         />
+                                        {validationErrors.protein && <small className="text-danger">{validationErrors.protein}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
                                         <label htmlFor="carbs" className="form-label" style={{ color: 'orange' }}>Carbohydrates (g)</label>
                                         <input
                                             type="number"
-                                            className="form-control border-0 border-bottom"
+                                            className={`form-control border-0 border-bottom ${validationErrors.carbs ? 'border-danger' : ''}`}
                                             style={{ color: 'orange' }}
                                             id="carbs"
                                             value={formValues.carbs}
-                                            onChange={(e) => setFormValues({ ...formValues, carbs: Number(e.target.value) })}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                validateNumberInput(value, 'carbs', 0, 5000)
+                                                setFormValues({ ...formValues, carbs: value })
+                                            }}
+                                            min="0"
+                                            max="5000"
                                             readOnly={!!selectedFood}
                                         />
+                                        {validationErrors.carbs && <small className="text-danger">{validationErrors.carbs}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
                                         <label htmlFor="fats" className="form-label" style={{ color: 'red' }}>Fats (g)</label>
                                         <input
                                             type="number"
-                                            className="form-control border-0 border-bottom"
+                                            className={`form-control border-0 border-bottom ${validationErrors.fats ? 'border-danger' : ''}`}
                                             style={{ color: 'red' }}
                                             id="fats"
                                             value={formValues.fats}
-                                            onChange={(e) => setFormValues({ ...formValues, fats: Number(e.target.value) })}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                validateNumberInput(value, 'fats', 0, 5000)
+                                                setFormValues({ ...formValues, fats: value })
+                                            }}
+                                            min="0"
+                                            max="5000"
                                             readOnly={!!selectedFood}
                                         />
+                                        {validationErrors.fats && <small className="text-danger">{validationErrors.fats}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
                                         <label htmlFor="fiber" className="form-label" style={{ color: 'green' }}>Dietary Fiber (g)</label>
                                         <input
                                             type="number"
-                                            className="form-control border-0 border-bottom"
+                                            className={`form-control border-0 border-bottom ${validationErrors.fiber ? 'border-danger' : ''}`}
                                             style={{ color: 'green' }}
                                             id="fiber"
                                             value={formValues.fiber}
-                                            onChange={(e) => setFormValues({ ...formValues, fiber: Number(e.target.value) })}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                validateNumberInput(value, 'fiber', 0, 1000)
+                                                setFormValues({ ...formValues, fiber: value })
+                                            }}
+                                            min="0"
+                                            max="1000"
                                             readOnly={!!selectedFood}
                                         />
+                                        {validationErrors.fiber && <small className="text-danger">{validationErrors.fiber}</small>}
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div className="text-center">
-                            <button type="submit" className="btn btn-font btn-primary mb-2" style={{ padding: '10px 20px', fontSize: '16px'}}>
-                                Log {selectedFood?.name || searchQuery.trim() || 'Custom Meal'}
+                            <button 
+                                type="submit" 
+                                className="btn btn-font btn-primary mb-2" 
+                                style={{ padding: '10px 20px', fontSize: '16px'}}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Logging...
+                                    </>
+                                ) : (
+                                    `Log ${selectedFood?.name || searchQuery.trim() || 'Custom Meal'}`
+                                )}
                             </button>
                         </div>
 
@@ -759,67 +862,132 @@ function MealsPage() {
                                         <label htmlFor="editCalories" className="form-label" style={{ color: 'purple' }}>Total Calories (kcal)</label>
                                         <input
                                             type="number"
-                                            className="form-control border-0 border-bottom"
+                                            className={`form-control border-0 border-bottom ${validationErrors.editCalories ? 'border-danger' : ''}`}
                                             style={{ color: 'purple' }}
                                             id="editCalories"
                                             value={editFormValues.calories}
-                                            onChange={(e) => setEditFormValues({ ...editFormValues, calories: Number(e.target.value) })}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                validateNumberInput(value, 'editCalories', 0, 50000)
+                                                setEditFormValues({ ...editFormValues, calories: value })
+                                            }}
+                                            min="0"
+                                            max="50000"
                                         />
+                                        {validationErrors.editCalories && <small className="text-danger">{validationErrors.editCalories}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
                                         <label htmlFor="editProtein" className="form-label" style={{ color: 'blue' }}>Protein (g)</label>
                                         <input
                                             type="number"
-                                            className="form-control border-0 border-bottom"
+                                            className={`form-control border-0 border-bottom ${validationErrors.editProtein ? 'border-danger' : ''}`}
                                             style={{ color: 'blue' }}
                                             id="editProtein"
                                             value={editFormValues.protein}
-                                            onChange={(e) => setEditFormValues({ ...editFormValues, protein: Number(e.target.value) })}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                validateNumberInput(value, 'editProtein', 0, 5000)
+                                                setEditFormValues({ ...editFormValues, protein: value })
+                                            }}
+                                            min="0"
+                                            max="5000"
                                         />
+                                        {validationErrors.editProtein && <small className="text-danger">{validationErrors.editProtein}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
                                         <label htmlFor="editCarbs" className="form-label" style={{ color: 'orange' }}>Carbohydrates (g)</label>
                                         <input
                                             type="number"
-                                            className="form-control border-0 border-bottom"
+                                            className={`form-control border-0 border-bottom ${validationErrors.editCarbs ? 'border-danger' : ''}`}
                                             style={{ color: 'orange' }}
                                             id="editCarbs"
                                             value={editFormValues.carbs}
-                                            onChange={(e) => setEditFormValues({ ...editFormValues, carbs: Number(e.target.value) })}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                validateNumberInput(value, 'editCarbs', 0, 5000)
+                                                setEditFormValues({ ...editFormValues, carbs: value })
+                                            }}
+                                            min="0"
+                                            max="5000"
                                         />
+                                        {validationErrors.editCarbs && <small className="text-danger">{validationErrors.editCarbs}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
                                         <label htmlFor="editFats" className="form-label" style={{ color: 'red' }}>Fats (g)</label>
                                         <input
                                             type="number"
-                                            className="form-control border-0 border-bottom"
+                                            className={`form-control border-0 border-bottom ${validationErrors.editFats ? 'border-danger' : ''}`}
                                             style={{ color: 'red' }}
                                             id="editFats"
                                             value={editFormValues.fats}
-                                            onChange={(e) => setEditFormValues({ ...editFormValues, fats: Number(e.target.value) })}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                validateNumberInput(value, 'editFats', 0, 5000)
+                                                setEditFormValues({ ...editFormValues, fats: value })
+                                            }}
+                                            min="0"
+                                            max="5000"
                                         />
+                                        {validationErrors.editFats && <small className="text-danger">{validationErrors.editFats}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
                                         <label htmlFor="editFiber" className="form-label" style={{ color: 'green' }}>Dietary Fiber (g)</label>
                                         <input
                                             type="number"
-                                            className="form-control border-0 border-bottom"
+                                            className={`form-control border-0 border-bottom ${validationErrors.editFiber ? 'border-danger' : ''}`}
                                             style={{ color: 'green' }}
                                             id="editFiber"
                                             value={editFormValues.fiber}
-                                            onChange={(e) => setEditFormValues({ ...editFormValues, fiber: Number(e.target.value) })}
+                                            onChange={(e) => {
+                                                const value = Number(e.target.value)
+                                                validateNumberInput(value, 'editFiber', 0, 1000)
+                                                setEditFormValues({ ...editFormValues, fiber: value })
+                                            }}
+                                            min="0"
+                                            max="1000"
                                         />
+                                        {validationErrors.editFiber && <small className="text-danger">{validationErrors.editFiber}</small>}
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div className="text-center">
-                            <button type="submit" className="btn btn-font btn-primary mb-2" style={{ padding: '10px 20px', fontSize: '16px'}}>
-                                Update Meal
+                            <button 
+                                type="submit" 
+                                className="btn btn-font btn-primary mb-2" 
+                                style={{ padding: '10px 20px', fontSize: '16px'}}
+                                disabled={isUpdating}
+                            >
+                                {isUpdating ? (
+                                    <>
+                                        <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        Updating...
+                                    </>
+                                ) : (
+                                    'Update Meal'
+                                )}
                             </button>
                         </div>
                     </form>
                 </Modal.Body>
+            </Modal>
+
+            {/* Login Prompt Modal */}
+            <Modal show={showLoginPrompt} centered onHide={() => setShowLoginPrompt(false)}>
+                <Modal.Header className="border-0" closeButton>
+                    <Modal.Title>Login Required</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <p className="mb-0">You need to login or register to log meals and track your nutrition.</p>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowLoginPrompt(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" onClick={() => window.location.href = '/login'}>
+                        Go to Login
+                    </Button>
+                </Modal.Footer>
             </Modal>
         </>
     )

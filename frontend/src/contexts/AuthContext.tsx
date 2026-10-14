@@ -49,6 +49,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [])
 
   const login = (newToken: string, newUser: User) => {
+    console.log('AuthContext login - User role:', newUser.role)
+    console.log('AuthContext login - User role (uppercase):', newUser.role?.toUpperCase())
     setToken(newToken)
     setUser(newUser)
     localStorage.setItem('token', newToken)
