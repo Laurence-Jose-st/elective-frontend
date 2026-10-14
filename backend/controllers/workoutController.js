@@ -347,4 +347,216 @@ export const workoutController = {
       res.status(500).json({ success: false, error: error.message });
     }
   },
+
+  /**
+   * Save a complete workout session with all exercises and sets
+   */
+  async saveSession(req, res) {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+
+      const { name, durationMinutes, weightUnit, notes, exercises } = req.body;
+
+      console.log('Saving session:', { name, durationMinutes, weightUnit, notes, exercisesCount: exercises?.length });
+
+      // Generate session UUID
+      const sessionUUID = randomUUID();
+
+      // Create session
+      const session = await prisma.workout_sessions.create({
+        data: {
+          user_id: sessionUUID,
+          name: name || 'Workout Session',
+          status: 'completed',
+          start_time: new Date(),
+          end_time: new Date(),
+          duration_seconds: durationMinutes * 60,
+          notes: JSON.stringify({ userId, sessionNotes: notes, weightUnit })
+        }
+      });
+
+      // Process each exercise
+      for (const exercise of exercises) {
+        // Find or create exercise in database
+        let exerciseRecord = await prisma.exercises.findFirst({
+          where: { name: { equals: exercise.exerciseName, mode: 'insensitive' } }
+        });
+
+        if (!exerciseRecord) {
+          // Create custom exercise with generated UUID
+          exerciseRecord = await prisma.exercises.create({
+            data: {
+              id: randomUUID(),
+              name: exercise.exerciseName,
+              body_part: exercise.bodyPart || 'custom',
+              target: exercise.target || 'custom',
+              equipment: exercise.equipment || 'custom',
+              gif_url: ''
+            }
+          });
+        }
+
+        // Create session exercise
+        const sessionExercise = await prisma.session_exercises.create({
+          data: {
+            session_id: session.id,
+            exercise_id: exerciseRecord.id,
+            order_in_session: exercises.indexOf(exercise) + 1
+          }
+        });
+
+        // Create workout sets
+        for (const set of exercise.sets) {
+          await prisma.workout_sets.create({
+            data: {
+              session_exercise_id: sessionExercise.id,
+              session_id: session.id,
+              user_id: sessionUUID,
+              exercise_id: exerciseRecord.id,
+              set_number: set.setNumber,
+              weight: set.weight,
+              reps: set.reps,
+              is_warmup: set.isWarmup || false
+            }
+          });
+        }
+
+        // Log to workout_logs for history
+        if (exercise.sets && exercise.sets.length > 0) {
+          const firstSet = exercise.sets[0];
+          const avgWeight = exercise.sets.reduce((sum, s) => sum + s.weight, 0) / exercise.sets.length;
+          const avgReps = exercise.sets.reduce((sum, s) => sum + s.reps, 0) / exercise.sets.length;
+
+          await prisma.workout_logs.create({
+            data: {
+              user_id: parseInt(userId),
+              exercise_name: exercise.exerciseName,
+              reps: Math.round(avgReps),
+              weight: Math.round(avgWeight),
+              duration: durationMinutes,
+              sets: exercise.sets.length
+            }
+          });
+        }
+      }
+
+      res.status(201).json({ success: true, data: session });
+    } catch (error) {
+      console.error('Error saving session:', error);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
+
+  /**
+   * Get completed workout sessions for history
+   */
+  async getCompletedSessions(req, res) {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+
+      const allSessions = await prisma.workout_sessions.findMany({
+        where: {
+          status: 'completed'
+        },
+        include: {
+          session_exercises: {
+            include: {
+              exercises: true,
+              workout_sets: true
+            },
+            orderBy: {
+              order_in_session: 'asc'
+            }
+          }
+        },
+        orderBy: {
+          start_time: 'desc'
+        }
+      });
+
+      // Filter sessions where notes contains the user ID
+      const sessions = allSessions.filter(s => {
+        try {
+          const notes = JSON.parse(s.notes || '{}');
+          return notes.userId === userId;
+        } catch {
+          return false;
+        }
+      });
+
+      res.json({ success: true, data: sessions });
+    } catch (error) {
+      console.error('Error getting completed sessions:', error);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
+
+  /**
+   * Get progressive overload data for exercises
+   */
+  async getProgressiveOverload(req, res) {
+    try {
+      const userId = req.user?.userId;
+      if (!userId) {
+        res.status(401).json({ success: false, error: 'Unauthorized' });
+        return;
+      }
+
+      const { exerciseName } = req.query;
+
+      // Get workout logs for this exercise
+      const logs = await prisma.workout_logs.findMany({
+        where: {
+          user_id: parseInt(userId),
+          ...(exerciseName && { exercise_name: { contains: exerciseName, mode: 'insensitive' } })
+        },
+        orderBy: {
+          created_at: 'desc'
+        },
+        take: 10
+      });
+
+      // Calculate progressive overload metrics
+      const metrics = logs.map(log => ({
+        date: log.created_at,
+        weight: log.weight,
+        reps: log.reps,
+        sets: log.sets,
+        volume: log.weight * log.reps * log.sets
+      }));
+
+      // Calculate improvements
+      const improvements = [];
+      for (let i = 0; i < metrics.length - 1; i++) {
+        const current = metrics[i];
+        const previous = metrics[i + 1];
+        improvements.push({
+          date: current.date,
+          weightChange: current.weight - previous.weight,
+          volumeChange: current.volume - previous.volume,
+          repsChange: current.reps - previous.reps
+        });
+      }
+
+      res.json({
+        success: true,
+        data: {
+          metrics,
+          improvements,
+          currentPR: metrics.length > 0 ? metrics[0] : null
+        }
+      });
+    } catch (error) {
+      console.error('Error getting progressive overload:', error);
+      res.status(500).json({ success: false, error: error.message });
+    }
+  },
 };

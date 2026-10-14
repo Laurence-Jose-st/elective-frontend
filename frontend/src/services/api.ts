@@ -125,6 +125,56 @@ export const workoutService = {
     return data;
   },
 
+  saveSession: async (sessionData: any) => {
+    const response = await fetch(`${API_BASE}/users/workouts/sessions`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(sessionData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to save session');
+    }
+
+    return data;
+  },
+
+  getCompletedSessions: async () => {
+    const response = await fetch(`${API_BASE}/users/workouts/sessions/completed`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch completed sessions');
+    }
+
+    return data;
+  },
+
+  getProgressiveOverload: async (exerciseName?: string) => {
+    const url = exerciseName
+      ? `${API_BASE}/users/workouts/progressive-overload?exerciseName=${encodeURIComponent(exerciseName)}`
+      : `${API_BASE}/users/workouts/progressive-overload`;
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch progressive overload data');
+    }
+
+    return data;
+  },
+
   searchExercises: async (query: string) => {
     const response = await fetch(`${API_BASE}/users/workouts/exercises/search?query=${encodeURIComponent(query)}`, {
       method: 'GET',
