@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import Navigation from '../components/Navigation'
 import { calculatorService } from '../services/api'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '../App.css'
@@ -80,7 +79,6 @@ function CalculatorPage() {
           </div>
           <div className="col-8">
             <div className="row">
-              <Navigation />
             </div>
           </div>
         </div>
