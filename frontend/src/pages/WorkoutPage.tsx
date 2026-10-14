@@ -367,15 +367,18 @@ function WorkoutPage() {
       : lastWorkout.weight + 2.5
     const suggestedReps = lastWorkout.reps + 1
 
+    // Progressive Overload Formula: if hit target reps (>= 8), suggest weight increase; otherwise suggest reps increase
+    const recommendation = lastWorkout.reps >= 8
+      ? `Increase weight by ${weightUnit === 'lbs' ? '5' : '2.5'}${weightUnit}`
+      : `Increase reps by 1-2 before adding weight`
+
     return {
       exerciseName,
       lastWeight: lastWorkout.weight,
       lastReps: lastWorkout.reps,
       suggestedWeight: Math.round(suggestedWeight * 10) / 10,
       suggestedReps,
-      recommendation: lastWorkout.reps >= 8
-        ? `Increase weight by ${weightUnit === 'lbs' ? '5' : '2.5'}${weightUnit}`
-        : `Increase reps by 1-2 before adding weight`
+      recommendation
     }
   }
 
@@ -797,6 +800,7 @@ function WorkoutPage() {
                       {selectedExerciseForProgression !== 'all' && previousWorkout && previousWorkout[selectedExerciseForProgression] && (
                         <div className="mb-4 p-3 bg-success bg-opacity-10 border border-success rounded">
                           <h6 className="fw-bold text-success">🎯 Suggested Challenge</h6>
+                          <div className="mb-2 text-muted small">Exercise: {selectedExerciseForProgression}</div>
                           {(() => {
                             const challenge = calculateSuggestedChallenge(selectedExerciseForProgression)
                             if (!challenge) return null
@@ -822,6 +826,9 @@ function WorkoutPage() {
                           {progressiveOverloadData.currentPR && (
                             <div className="mb-4 p-3 bg-light rounded">
                               <h6 className="fw-bold">Current Personal Record</h6>
+                              {progressiveOverloadData.currentPR.exerciseName && (
+                                <p className="mb-2 text-muted small">Exercise: {progressiveOverloadData.currentPR.exerciseName}</p>
+                              )}
                               <div className="d-flex gap-4">
                                 <div>
                                   <small className="text-muted">Weight</small>
@@ -848,6 +855,7 @@ function WorkoutPage() {
                                     <div>
                                       <div className="fw-bold">{formatDate(metric.date)}</div>
                                       <small className="text-muted">
+                                        {metric.exerciseName ? `${metric.exerciseName}: ` : ''}
                                         {metric.weight} lbs × {metric.reps} reps × {metric.sets} sets
                                       </small>
                                     </div>
@@ -864,7 +872,12 @@ function WorkoutPage() {
                               <div className="list-group">
                                 {progressiveOverloadData.improvements.map((improvement: any, idx: number) => (
                                   <div key={idx} className="list-group-item">
-                                    <div className="fw-bold">{formatDate(improvement.date)}</div>
+                                    <div className="fw-bold">
+                                      {formatDate(improvement.date)}
+                                      {improvement.exerciseName && (
+                                        <span className="text-muted ms-2">- {improvement.exerciseName}</span>
+                                      )}
+                                    </div>
                                     <div className="d-flex gap-3 mt-2">
                                       <div>
                                         <small className="text-muted">Weight Change</small>
