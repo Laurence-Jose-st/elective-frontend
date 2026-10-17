@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { Tabs, Tab, Button, Badge, Table, Modal, Form, Alert } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import { adminService } from '../services/api'
+import Navigation from '../components/Navigation'
 import '../App.css'
 
 function AdminPage() {
@@ -209,137 +210,144 @@ function AdminPage() {
   }
 
   return (
-    <div className="container mt-4">
-      <div className="row">
-        <div className="col-12">
-          <h1 className="mb-4">Admin Dashboard</h1>
-          
-          <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k as any)} className="mb-4">
-            <Tab eventKey="users" title="User Management">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title mb-4">All Users</h5>
-                  <Table striped hover responsive>
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {users.map((u) => (
-                        <tr key={u.id}>
-                          <td>{u.id}</td>
-                          <td>{u.username}</td>
-                          <td>{u.email}</td>
-                          <td>{u.role}</td>
-                          <td>
-                            {u.flagged ? (
-                              <Badge bg="danger">Flagged</Badge>
-                            ) : (
-                              <Badge bg="success">Active</Badge>
-                            )}
-                          </td>
-                          <td>{new Date(u.created_at).toLocaleDateString()}</td>
-                          <td>
-                            <Button
-                              variant={u.flagged ? "success" : "warning"}
-                              size="sm"
-                              className="me-2"
-                              onClick={() => handleFlagUser(u.id)}
-                            >
-                              {u.flagged ? 'Unflag' : 'Flag'}
-                            </Button>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => handleDeleteUser(u.id)}
-                            >
-                              Delete
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </div>
-              </div>
-            </Tab>
+    <>
+      <div className="container-fluid py-3 px-5">
+        <div className="row align-items-center">
+          <div className="col-4">
+            <h1 className="mb-0 bbh-bartle-regular text-pure-white">Admin Dashboard</h1>
+          </div>
+          <div className="col-8">
+            <Navigation />
+          </div>
+        </div>
+      </div>
 
-            <Tab eventKey="broadcast" title="Broadcast Messaging">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title mb-4">Send Broadcast</h5>
-                  <Button variant="primary" onClick={() => setShowBroadcastModal(true)}>
-                    <i className="bi bi-megaphone"></i> Send New Broadcast
-                  </Button>
-                  
-                  <h6 className="mt-4 mb-3">Recent Broadcasts</h6>
-                  {notifications.length === 0 ? (
-                    <Alert variant="info">No broadcasts sent yet.</Alert>
-                  ) : (
-                    <div className="list-group">
-                      {notifications.map((n) => (
-                        <div key={n.id} className="list-group-item">
-                          <div className="d-flex justify-content-between align-items-center">
-                            <div>
-                              <strong>{n.title}</strong>
-                              <p className="mb-0 text-muted small">{n.message}</p>
-                            </div>
-                            <small className="text-muted">
-                              {new Date(n.created_at).toLocaleString()}
-                            </small>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </Tab>
-
-            <Tab eventKey="database" title="Database Management">
-              <div className="card">
-                <div className="card-body">
-                  <h5 className="card-title mb-4">Database Management</h5>
-                  <Alert variant="info">
-                    <p className="mb-0">
-                      <strong>Food Items:</strong> Add or manage food database entries.<br/>
-                      <strong>Exercises:</strong> Add or manage exercise database entries.
-                    </p>
-                  </Alert>
-                  <div className="row mt-3">
-                    <div className="col-md-6">
-                      <div className="card">
-                        <div className="card-body">
-                          <h6 className="card-title">Food Database</h6>
-                          <Button variant="primary" className="w-100" onClick={() => setShowFoodModal(true)}>
-                            Add Food Item
+      <div className="container mt-4">
+        <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k as any)} className="mb-4">
+          <Tab eventKey="users" title="User Management">
+            <div className="card bg-charcoal border-0">
+              <div className="card-body">
+                <h5 className="card-title mb-4 text-pure-white">All Users</h5>
+                <Table striped hover responsive>
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Username</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Created</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((u) => (
+                      <tr key={u.id}>
+                        <td>{u.id}</td>
+                        <td>{u.username}</td>
+                        <td>{u.email}</td>
+                        <td>{u.role}</td>
+                        <td>
+                          {u.flagged ? (
+                            <Badge bg="danger">Flagged</Badge>
+                          ) : (
+                            <Badge bg="success">Active</Badge>
+                          )}
+                        </td>
+                        <td>{new Date(u.created_at).toLocaleDateString()}</td>
+                        <td>
+                          <Button
+                            variant={u.flagged ? "success" : "warning"}
+                            size="sm"
+                            className="me-2"
+                            onClick={() => handleFlagUser(u.id)}
+                          >
+                            {u.flagged ? 'Unflag' : 'Flag'}
                           </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => handleDeleteUser(u.id)}
+                          >
+                            Delete
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
+            </div>
+          </Tab>
+
+          <Tab eventKey="broadcast" title="Broadcast Messaging">
+            <div className="card bg-charcoal border-0">
+              <div className="card-body">
+                <h5 className="card-title mb-4 text-pure-white">Send Broadcast</h5>
+                <Button variant="primary" onClick={() => setShowBroadcastModal(true)}>
+                  <i className="bi bi-megaphone"></i> Send New Broadcast
+                </Button>
+
+                <h6 className="mt-4 mb-3">Recent Broadcasts</h6>
+                {notifications.length === 0 ? (
+                  <Alert variant="info">No broadcasts sent yet.</Alert>
+                ) : (
+                  <div className="list-group">
+                    {notifications.map((n) => (
+                      <div key={n.id} className="list-group-item">
+                        <div className="d-flex justify-content-between align-items-center">
+                          <div>
+                            <strong>{n.title}</strong>
+                            <p className="mb-0 text-muted small">{n.message}</p>
+                          </div>
+                          <small className="text-muted">
+                            {new Date(n.created_at).toLocaleString()}
+                          </small>
                         </div>
                       </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          </Tab>
+
+          <Tab eventKey="database" title="Database Management">
+            <div className="card bg-charcoal border-0">
+              <div className="card-body">
+                <h5 className="card-title mb-4 text-pure-white">Database Management</h5>
+                <Alert variant="info" className="bg-charcoal text-pure-white">
+                  <p className="mb-0 text-off-white">
+                    <strong>Food Items:</strong> Add or manage food database entries.<br/>
+                    <strong>Exercises:</strong> Add or manage exercise database entries.
+                  </p>
+                </Alert>
+                <div className="row mt-3">
+                  <div className="col-md-6">
+                    <div className="card bg-charcoal border-0">
+                      <div className="card-body">
+                        <h6 className="card-title text-neon-yellow">Food Database</h6>
+                        <Button variant="primary" className="w-100" onClick={() => setShowFoodModal(true)}>
+                          Add Food Item
+                        </Button>
+                      </div>
                     </div>
-                    <div className="col-md-6">
-                      <div className="card">
-                        <div className="card-body">
-                          <h6 className="card-title">Exercise Database</h6>
-                          <Button variant="primary" className="w-100" onClick={() => setShowExerciseModal(true)}>
-                            Add Exercise
-                          </Button>
-                        </div>
+                  </div>
+                  <div className="col-md-6">
+                    <div className="card bg-charcoal border-0">
+                      <div className="card-body">
+                        <h6 className="card-title text-neon-yellow">Exercise Database</h6>
+                        <Button variant="primary" className="w-100" onClick={() => setShowExerciseModal(true)}>
+                          Add Exercise
+                        </Button>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </Tab>
-          </Tabs>
-        </div>
+            </div>
+          </Tab>
+        </Tabs>
       </div>
 
       {/* Broadcast Modal */}
@@ -574,7 +582,7 @@ function AdminPage() {
           </Button>
         </Modal.Footer>
       </Modal>
-    </div>
+    </>
   )
 }
 

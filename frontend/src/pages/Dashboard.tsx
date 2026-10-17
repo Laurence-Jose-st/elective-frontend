@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import WorkoutCharts from '../components/WorkoutCharts'
 import { workoutService, mealService } from '../services/api'
 import { useState, useEffect } from 'react'
+import Navigation from '../components/Navigation'
 import '../App.css'
 
 function Dashboard() {
@@ -108,13 +109,12 @@ function Dashboard() {
   return (
     <>
       <div className="container-fluid py-3 px-5">
-        <div className="row align-items-center">
+        <div className="row align-items-center mt-2">
           <div className="col-4">
-            <h1 className="mb-0 bbh-bartle-regular">Dashboard</h1>
+            <h1 className="mb-0 bbh-bartle-regular text-pure-white">Dashboard</h1>
           </div>
           <div className="col-8">
-            <div className="row">
-            </div>
+            <Navigation />
           </div>
         </div>
       </div>
@@ -122,37 +122,37 @@ function Dashboard() {
       <div className="container mt-3">
         <div className="row">
           <div className="col-12">
-            <p className="mb-0 finlandica-text-regular text-muted">{currentDate}</p>
-            <h5 className=" card-title mb-4 finlandica-text-regular">Welcome, {user?.username || 'User'}!</h5>
+            <p className="mb-0 finlandica-text-regular text-off-white">{currentDate}</p>
+            <h5 className=" card-title mb-4 finlandica-text-regular text-pure-white">Welcome, {user?.username || 'User'}!</h5>
 
             <div className="card border-0 mb-4">
-              <div className="card-body">
+              <div className="card-body bg-charcoal">
                 <Carousel interval={5000} controls={true}>
                   <Carousel.Item>
-                    <div className="p-4 bg-light rounded-0" style={{ height: '350px' }}>
-                      <h3 className="text-center mb-4 finlandica-text-regular">Weekly Performance</h3>
+                    <div className="p-4 bg-charcoal rounded-0" style={{ height: '400px' }}>
+                      <h3 className="text-center mb-4 finlandica-text-regular text-off-white">Weekly Performance</h3>
                       <WorkoutCharts />
                     </div>
                   </Carousel.Item>
 
                   <Carousel.Item>
-                    <div className="p-4 bg-primary text-white rounded-0" style={{ height: '350px' }}>
-                      <h3 className="text-center mb-4">Workout Progress</h3>
+                    <div className="p-4 bg-charcoal text-fonts text-white rounded-0 d-flex flex-column" style={{ height: '400px' }}>
+                      <h3 className="text-center mb-4 finlandica-text-regular text-off-white">Workout Progress</h3>
                       {progressiveData ? (
-                        <div className="row g-3">
+                        <div className="row g-3 align-items-center flex-grow-1">
                           {/* Card 1: Personal Record */}
                           <div className="col-4">
-                            <div className="p-2 bg-white bg-opacity-10 rounded border border-white border-opacity-25 h-100">
-                              <h6 className="fw-bold mb-2 small">🏆 PR</h6>
+                            <div className="p-4 bg-neon-yellow bg-opacity-10 rounded border-0 border-white border-opacity-25 h-100 d-flex flex-column justify-content-center" style={{ minHeight: '180px' }}>
+                              <h6 className="fw-bold mb-2 small text-off-black text-fonts">PR</h6>
                               {progressiveData.currentPR && (
                                 <>
                                   {progressiveData.currentPR.exerciseName && (
-                                    <p className="mb-1 text-white-50" style={{ fontSize: '0.75rem' }}>{progressiveData.currentPR.exerciseName}</p>
+                                    <p className="mb-1 text-off-black" style={{ fontSize: '0.75rem' }}>{progressiveData.currentPR.exerciseName}</p>
                                   )}
-                                  <p className="mb-1 fw-bold" style={{ fontSize: '1rem' }}>
+                                  <p className="mb-1 fw-bold text-off-black text-fonts" style={{ fontSize: '2rem' }}>
                                     {progressiveData.currentPR.weight} lbs × {progressiveData.currentPR.reps} reps
                                   </p>
-                                  <small className="text-white-50" style={{ fontSize: '0.7rem' }}>Vol: {progressiveData.currentPR.volume} lbs</small>
+                                  <small className="text-off-black" style={{ fontSize: '0.7rem' }}>Vol: {progressiveData.currentPR.volume} lbs</small>
                                 </>
                               )}
                             </div>
@@ -160,48 +160,48 @@ function Dashboard() {
 
                           {/* Card 2: Next Goal */}
                           <div className="col-4">
-                            <div className="p-2 bg-white bg-opacity-10 rounded border border-white border-opacity-25 h-100">
-                              <h6 className="fw-bold mb-2 small">🎯 Next Goal</h6>
+                            <div className="p-4 bg-neon-yellow bg-opacity-10 rounded border-0 border-white border-opacity-25 h-100 d-flex flex-column justify-content-center" style={{ minHeight: '180px' }}>
+                              <h6 className="fw-bold mb-2 small text-off-black text-fonts">Next Goal</h6>
                               {progressiveData.improvements && progressiveData.improvements.length > 0 ? (
                                 (() => {
                                   const weightChange = progressiveData.improvements[0].weightChange
                                   if (weightChange === 0) {
                                     return (
                                       <>
-                                        <p className="mb-1" style={{ fontSize: '0.9rem' }}>Increase reps</p>
-                                        <small className="text-white-50" style={{ fontSize: '0.7rem' }}>at current weight</small>
+                                        <p className="mb-1 fw-bold text-off-black text-fonts" style={{ fontSize: '2rem' }}>Increase reps</p>
+                                        <small className="text-off-black" style={{ fontSize: '0.7rem' }}>at current weight</small>
                                       </>
                                     )
                                   } else {
                                     return (
                                       <>
-                                        <p className="mb-1 fw-bold" style={{ fontSize: '1rem' }}>
+                                        <p className="mb-1 fw-bold text-off-black text-fonts" style={{ fontSize: '2rem' }}>
                                           {weightChange >= 0 ? '+' : ''}{weightChange} lbs
                                         </p>
-                                        <small className="text-white-50" style={{ fontSize: '0.7rem' }}>progression</small>
+                                        <small className="text-off-black" style={{ fontSize: '0.7rem' }}>progression</small>
                                       </>
                                     )
                                   }
                                 })()
                               ) : (
-                                <p className="mb-0" style={{ fontSize: '0.8rem' }}>Start logging workouts</p>
+                                <p className="mb-0 text-off-black" style={{ fontSize: '0.8rem' }}>Start logging workouts</p>
                               )}
                             </div>
                           </div>
 
                           {/* Card 3: Recent Session */}
                           <div className="col-4">
-                            <div className="p-2 bg-white bg-opacity-10 rounded border border-white border-opacity-25 h-100">
-                              <h6 className="fw-bold mb-2 small">� Recent</h6>
+                            <div className="p-4 bg-neon-yellow bg-opacity-10 rounded border-0 border-white border-opacity-25 h-100 d-flex flex-column justify-content-center" style={{ minHeight: '180px' }}>
+                              <h6 className="fw-bold mb-2 small text-off-black text-fonts">Recent</h6>
                               {progressiveData.metrics && progressiveData.metrics.length > 0 ? (
                                 <>
                                   {progressiveData.metrics[0].exerciseName && (
-                                    <p className="mb-1 text-white-50" style={{ fontSize: '0.75rem' }}>{progressiveData.metrics[0].exerciseName}</p>
+                                    <p className="mb-1 text-off-black" style={{ fontSize: '0.75rem' }}>{progressiveData.metrics[0].exerciseName}</p>
                                   )}
-                                  <p className="mb-1 fw-bold" style={{ fontSize: '0.9rem' }}>
+                                  <p className="mb-1 fw-bold text-off-black text-fonts" style={{ fontSize: '2rem' }}>
                                     {progressiveData.metrics[0].weight} lbs × {progressiveData.metrics[0].reps} reps
                                   </p>
-                                  <small className="text-white-50" style={{ fontSize: '0.7rem' }}>
+                                  <small className="text-off-black" style={{ fontSize: '0.7rem' }}>
                                     {progressiveData.metrics[0].sets} sets × {progressiveData.metrics[0].volume} lbs vol
                                   </small>
                                 </>
@@ -217,10 +217,10 @@ function Dashboard() {
                     </div>
                   </Carousel.Item>
                   <Carousel.Item>
-                    <div className="p-4 bg-primary text-white rounded-0" style={{ height: '350px' }}>
-                      <h3 className="text-center mb-4">Today's Meal Diary</h3>
+                    <div className="p-4 bg-charcoal text-white rounded-0 d-flex flex-column" style={{ height: '400px' }}>
+                      <h3 className="text-center mb-4 text-fonts text-off-white">Today's Meal Diary</h3>
                       {todayMeals.length > 0 ? (
-                        <div className="row g-2" style={{ maxHeight: '250px', overflowY: 'auto' }}>
+                        <div className="row g-2 flex-grow-1" style={{ maxHeight: '250px', overflowY: 'auto' }}>
                           {todayMeals.slice(0, 6).map((meal: any, idx: number) => (
                             <div key={idx} className="col-6">
                               <div className="p-2 bg-white bg-opacity-10 rounded border border-white border-opacity-25">
@@ -245,39 +245,39 @@ function Dashboard() {
 
             <div className="row">
               <div className="col-6">
-                <div className="card mb-4">
-                  <div className="card-body">
+                <div className="card border-0 rounded-2 mb-4">
+                  <div className="card-body bg-off-black">
 
-                    <h5 className="card-title mb-4 finlandica-text-regular">Daily Performance</h5>
+                    <h5 className="card-title mb-4 text-bold finlandica-text-regular text-off-white">Daily Performance</h5>
                     <div className="row">
                       <div className="col-6 mb-3">
-                        <div className="p-3 bg-light rounded">
-                          <h3 className="mb-1">{dailyStats.exercises}</h3>
-                          <small className="text-fonts text-muted">Exercises</small>
+                        <div className="p-3 bg-charcoal rounded">
+                          <h3 className="mb-1 text-pure-white">{dailyStats.exercises}</h3>
+                          <small className="text-fonts text-off-white">Exercises</small>
                         </div>
                       </div>
                       <div className="col-6 mb-3">
-                        <div className="p-3 bg-light rounded">
-                          <h3 className="mb-1">{dailyStats.totalSets}</h3>
-                          <small className="text-fonts text-muted">Total Sets</small>
+                        <div className="p-3 bg-charcoal rounded">
+                          <h3 className="mb-1 text-pure-white">{dailyStats.totalSets}</h3>
+                          <small className="text-fonts text-off-white">Total Sets</small>
                         </div>
                       </div>
                       <div className="col-6 mb-3">
-                        <div className="p-3 bg-light rounded">
-                          <h3 className="mb-1">{dailyStats.totalReps}</h3>
-                          <small className="text-fonts text-muted">Total Reps</small>
+                        <div className="p-3 bg-charcoal rounded">
+                          <h3 className="mb-1 text-pure-white">{dailyStats.totalReps}</h3>
+                          <small className="text-fonts text-off-white">Total Reps</small>
                         </div>
                       </div>
                       <div className="col-6 mb-3">
-                        <div className="p-3 bg-light rounded">
-                          <h3 className="mb-1">{dailyStats.totalWeight} lbs</h3>
-                          <small className="text-fonts text-muted">Total Weight</small>
+                        <div className="p-3 bg-charcoal rounded">
+                          <h3 className="mb-1 text-pure-white">{dailyStats.totalWeight} lbs</h3>
+                          <small className="text-fonts text-off-white">Total Weight</small>
                         </div>
                       </div>
                       <div className="col-12">
-                        <div className="p-3 bg-light rounded">
-                          <h3 className="mb-1">{dailyStats.totalDuration} min</h3>
-                          <small className="text-fonts text-muted">Active Duration</small>
+                        <div className="p-3 bg-charcoal rounded">
+                          <h3 className="mb-1 text-pure-white">{dailyStats.totalDuration} min</h3>
+                          <small className="text-fonts text-off-white">Active Duration</small>
                         </div>
                       </div>
                     </div>
@@ -287,38 +287,38 @@ function Dashboard() {
 
 
               <div className="col-6">
-                <div className="card mb-4">
-                  <div className="card-body">
-                    <h5 className="card-title mb-4 finlandica-text-regular">Nutrition Summary</h5>
+                <div className="card border-0 mb-4">
+                  <div className="card-body bg-off-black">
+                    <h5 className="card-title mb-4 finlandica-text-regular text-off-white">Nutrition Summary</h5>
                     <div className="row">
                       <div className="col-6 mb-3">
-                        <div className="p-3 bg-light rounded">
-                          <h3 className="mb-1">{nutritionStats.calories}</h3>
-                          <small className="text-fonts text-muted">Calories (kcal)</small>
+                        <div className="p-3 bg-charcoal rounded">
+                          <h3 className="mb-1 text-pure-white">{nutritionStats.calories}</h3>
+                          <small className="text-fonts text-off-white">Calories (kcal)</small>
                         </div>
                       </div>
                       <div className="col-6 mb-3">
-                        <div className="p-3 bg-light rounded">
-                          <h3 className="mb-1">{nutritionStats.protein}g</h3>
-                          <small className="text-fonts text-muted">Protein</small>
+                        <div className="p-3 bg-charcoal rounded">
+                          <h3 className="mb-1 text-pure-white">{nutritionStats.protein}g</h3>
+                          <small className="text-fonts text-off-white">Protein</small>
                         </div>
                       </div>
                       <div className="col-6 mb-3">
-                        <div className="p-3 bg-light rounded">
-                          <h3 className="mb-1">{nutritionStats.carbs}g</h3>
-                          <small className="text-fonts text-muted">Carbohydrates</small>
+                        <div className="p-3 bg-charcoal rounded">
+                          <h3 className="mb-1 text-pure-white">{nutritionStats.carbs}g</h3>
+                          <small className="text-fonts text-off-white">Carbohydrates</small>
                         </div>
                       </div>
                       <div className="col-6 mb-3">
-                        <div className="p-3 bg-light rounded">
-                          <h3 className="mb-1">{nutritionStats.fats}g</h3>
-                          <small className="text-fonts text-muted">Fats</small>
+                        <div className="p-3 bg-charcoal rounded">
+                          <h3 className="mb-1 text-pure-white">{nutritionStats.fats}g</h3>
+                          <small className="text-fonts text-off-white">Fats</small>
                         </div>
                       </div>
                       <div className="col-12">
-                        <div className="p-3 bg-light rounded">
-                          <h3 className="mb-1">{nutritionStats.fiber}g</h3>
-                          <small className="text-fonts text-muted">Dietary Fiber</small>
+                        <div className="p-3 bg-charcoal rounded">
+                          <h3 className="mb-1 text-pure-white">{nutritionStats.fiber}g</h3>
+                          <small className="text-fonts text-off-white">Dietary Fiber</small>
                         </div>
                       </div>
                     </div>
@@ -327,15 +327,16 @@ function Dashboard() {
               </div>
             </div>
 
-            <div className="card mb-4">
-              <div className="card-body">
-                <h5 className="card-title mb-4 finlandica-text-regular">Target Progress</h5>
+            <div className="card bg-charcoal border-0 mb-4">
+              <div className="card-body rounded-4">
+                <h5 className="card-title ms-3 mt-3 mb-4 finlandica-text-regular text-off-white">Target Progress</h5>
                 {todayWorkouts.length === 0 ? (
-                  <div className="alert alert-info mb-0">
-                    <h6 className="alert-heading">🏋️ Ready to Lift?</h6>
-                    <p className="mb-0">You haven't logged a workout today. Start your session now to track your progress!</p>
+                  <div className="alert bg-charcoal mb-0">
+                    <h6 className="alert-heading text-pure-white">Ready to Lift?</h6>
+                    <p className="mb-2 text-off-white">You haven't logged a workout today. Start your session now to track your progress!</p>
                     <button
-                      className="btn btn-primary btn-sm mt-2"
+                      className="btn btn-font font-bold bg-neon-yellow btn-md mt-2"
+                   
                       onClick={() => window.location.href = '/workout'}
                     >
                       Start Workout

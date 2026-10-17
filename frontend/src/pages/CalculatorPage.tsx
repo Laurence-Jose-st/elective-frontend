@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { calculatorService } from '../services/api'
 import 'bootstrap/dist/css/bootstrap.min.css'
+import Navigation from '../components/Navigation'
 import '../App.css'
 
 interface CalculatorResult {
@@ -75,11 +76,10 @@ function CalculatorPage() {
       <div className="container-fluid py-3 px-5">
         <div className="row align-items-center">
           <div className="col-4">
-            <h1 className="mb-0 bbh-bartle-regular">BMI Calculator</h1>
+            <h1 className="mb-0 bbh-bartle-regular text-pure-white">BMI Calculator</h1>
           </div>
           <div className="col-8">
-            <div className="row">
-            </div>
+            <Navigation />
           </div>
         </div>
       </div>
@@ -87,12 +87,12 @@ function CalculatorPage() {
       <div className="container mt-4">
         <div className="row">
           <div className="col-md-6">
-            <div className="card border-0 mb-4">
+            <div className="card bg-charcoal border-0 mb-4">
               <div className="card-body">
-                <h5 className="card-title mb-4 finlandica-text-regular">Enter Your Details</h5>
+                <h5 className="card-title mb-4 finlandica-text-regular text-pure-white">Enter Your Details</h5>
                 <form onSubmit={handleCalculate}>
                   <div className="mb-3">
-                    <label htmlFor="weight" className="form-label">Weight (kg)</label>
+                    <label htmlFor="weight" className="form-label text-pure-white">Weight (kg)</label>
                     <input
                       type="number"
                       className="form-control border-0 border-bottom"
@@ -107,7 +107,7 @@ function CalculatorPage() {
                   </div>
 
                   <div className="mb-3">
-                    <label htmlFor="height" className="form-label">Height (cm)</label>
+                    <label htmlFor="height" className="form-label text-pure-white">Height (cm)</label>
                     <input
                       type="number"
                       className="form-control border-0 border-bottom"
@@ -122,7 +122,7 @@ function CalculatorPage() {
                   </div>
 
                   <div className="mb-3">
-                    <label htmlFor="age" className="form-label">Age</label>
+                    <label htmlFor="age" className="form-label text-pure-white">Age</label>
                     <input
                       type="number"
                       className="form-control border-0 border-bottom"
@@ -136,7 +136,7 @@ function CalculatorPage() {
                   </div>
 
                   <div className="mb-3">
-                    <label htmlFor="gender" className="form-label">Gender</label>
+                    <label htmlFor="gender" className="form-label text-pure-white">Gender</label>
                     <select
                       className="form-select border-0 border-bottom"
                       id="gender"
@@ -150,7 +150,7 @@ function CalculatorPage() {
                   </div>
 
                   <div className="mb-4">
-                    <label htmlFor="activity" className="form-label">Activity Level</label>
+                    <label htmlFor="activity" className="form-label text-pure-white">Activity Level</label>
                     <select
                       className="form-select border-0 border-bottom"
                       id="activity"
@@ -167,7 +167,7 @@ function CalculatorPage() {
                   </div>
 
                   {error && (
-                    <div className="alert alert-danger mb-3">
+                    <div className="alert alert-danger mb-3 bg-charcoal text-pure-white">
                       {error}
                     </div>
                   )}
@@ -186,9 +186,9 @@ function CalculatorPage() {
 
           <div className="col-md-6">
             {result ? (
-              <div className="card border-0 mb-4">
+              <div className="card bg-charcoal border-0 mb-4">
                 <div className="card-body">
-                  <h5 className="card-title mb-4 finlandica-text-regular">Your Results</h5>
+                  <h5 className="card-title mb-4 finlandica-text-regular text-pure-white">Your Results</h5>
 
                   <div className="text-center mb-4">
                     <h2 className={`display-4 fw-bold ${getBmiColor(result.category)}`}>
@@ -197,61 +197,61 @@ function CalculatorPage() {
                     <p className={`fw-bold ${getBmiColor(result.category)}`}>
                       {result.category}
                     </p>
-                    <small className="text-muted">{result.riskLevel}</small>
+                    <small className="text-off-white">{result.riskLevel}</small>
                   </div>
 
                   <div className="row mb-4">
                     <div className="col-6 mb-3">
-                      <div className="p-3 bg-light rounded">
-                        <h6 className="mb-1">Healthy Weight Range</h6>
-                        <p className="mb-0 text-fonts">
+                      <div className="p-3 bg-charcoal rounded">
+                        <h6 className="mb-1 text-neon-yellow">Healthy Weight Range</h6>
+                        <p className="mb-0 text-fonts text-pure-white">
                           {result.metrics.healthyWeightRangeKg.min} - {result.metrics.healthyWeightRangeKg.max} kg
                         </p>
                       </div>
                     </div>
                     <div className="col-6 mb-3">
-                      <div className="p-3 bg-light rounded">
-                        <h6 className="mb-1">BMR (Basal)</h6>
-                        <p className="mb-0 text-fonts">{result.metrics.estimatedBmrCalories} kcal/day</p>
+                      <div className="p-3 bg-charcoal rounded">
+                        <h6 className="mb-1 text-neon-yellow">BMR (Basal)</h6>
+                        <p className="mb-0 text-fonts text-pure-white">{result.metrics.estimatedBmrCalories} kcal/day</p>
                       </div>
                     </div>
                     <div className="col-6 mb-3">
-                      <div className="p-3 bg-light rounded">
-                        <h6 className="mb-1">TDEE (Total)</h6>
-                        <p className="mb-0 text-fonts">{result.metrics.estimatedTdeeCalories} kcal/day</p>
+                      <div className="p-3 bg-charcoal rounded">
+                        <h6 className="mb-1 text-neon-yellow">TDEE (Total)</h6>
+                        <p className="mb-0 text-fonts text-pure-white">{result.metrics.estimatedTdeeCalories} kcal/day</p>
                       </div>
                     </div>
                     <div className="col-6 mb-3">
-                      <div className="p-3 bg-light rounded">
-                        <h6 className="mb-1">Maintenance</h6>
-                        <p className="mb-0 text-fonts">{result.caloricGuidelines.weightMaintenance} kcal/day</p>
+                      <div className="p-3 bg-charcoal rounded">
+                        <h6 className="mb-1 text-neon-yellow">Maintenance</h6>
+                        <p className="mb-0 text-fonts text-pure-white">{result.caloricGuidelines.weightMaintenance} kcal/day</p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="card border-0 bg-light mb-3">
+                  <div className="card border-0 bg-charcoal mb-3">
                     <div className="card-body">
-                      <h6 className="card-title mb-3">Caloric Guidelines</h6>
+                      <h6 className="card-title mb-3 text-pure-white">Caloric Guidelines</h6>
                       <div className="d-flex justify-content-between mb-2">
-                        <span className="text-fonts">Fat Loss:</span>
-                        <strong className="text-warning">{result.caloricGuidelines.fatLossCutting} kcal</strong>
+                        <span className="text-fonts text-off-white">Fat Loss:</span>
+                        <strong className="text-neon-yellow">{result.caloricGuidelines.fatLossCutting} kcal</strong>
                       </div>
                       <div className="d-flex justify-content-between mb-2">
-                        <span className="text-fonts">Maintenance:</span>
-                        <strong className="text-success">{result.caloricGuidelines.weightMaintenance} kcal</strong>
+                        <span className="text-fonts text-off-white">Maintenance:</span>
+                        <strong className="text-neon-yellow">{result.caloricGuidelines.weightMaintenance} kcal</strong>
                       </div>
                       <div className="d-flex justify-content-between">
-                        <span className="text-fonts">Muscle Gain:</span>
-                        <strong className="text-primary">{result.caloricGuidelines.leanMuscleBulking} kcal</strong>
+                        <span className="text-fonts text-off-white">Muscle Gain:</span>
+                        <strong className="text-neon-yellow">{result.caloricGuidelines.leanMuscleBulking} kcal</strong>
                       </div>
                     </div>
                   </div>
 
                   {result.recommendations.length > 0 && (
-                    <div className="card border-0 bg-light">
+                    <div className="card border-0 bg-charcoal">
                       <div className="card-body">
-                        <h6 className="card-title mb-3">Recommendations</h6>
-                        <ul className="mb-0 text-fonts">
+                        <h6 className="card-title mb-3 text-pure-white">Recommendations</h6>
+                        <ul className="mb-0 text-fonts text-off-white">
                           {result.recommendations.map((rec, index) => (
                             <li key={index} className="mb-2">{rec}</li>
                           ))}
@@ -262,9 +262,9 @@ function CalculatorPage() {
                 </div>
               </div>
             ) : (
-              <div className="card border-0 mb-4">
+              <div className="card bg-charcoal border-0 mb-4">
                 <div className="card-body text-center py-5">
-                  <h5 className="text-muted">Enter your details and click "Calculate BMI" to see your results</h5>
+                  <h5 className="text-off-white">Enter your details and click "Calculate BMI" to see your results</h5>
                 </div>
               </div>
             )}

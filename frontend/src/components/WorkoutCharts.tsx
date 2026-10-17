@@ -76,7 +76,7 @@ function WorkoutCharts({ refreshTrigger = 0 }: WorkoutChartsProps) {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="exercises" fill="#0088FE" name="Exercises Done" />
+          <Bar dataKey="exercises" fill="#CEFE46" name="Exercises Done" />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -17,10 +17,10 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-icons/font/bootstrap-icons.css'
 import './App.css'
 
-function MainLayout({ children }: { children: React.ReactNode }) {
+function MainLayout({ children, showNav = true }: { children: React.ReactNode; showNav?: boolean }) {
   return (
     <div className="d-flex flex-column min-vh-100">
-      <Navigation />
+      {showNav && <Navigation />}
       <main className="flex-1">
         {children}
       </main>
@@ -35,12 +35,12 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={
-            <MainLayout>
+            <MainLayout showNav={false}>
               <Dashboard />
             </MainLayout>
           } />
           <Route path="/home" element={
-            <MainLayout>
+            <MainLayout showNav={false}>
               <Dashboard />
             </MainLayout>
           } />
@@ -50,34 +50,34 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/admin" element={
             <AdminRoute>
-              <MainLayout>
+              <MainLayout showNav={false}>
                 <AdminPage />
               </MainLayout>
             </AdminRoute>
           } />
           <Route path="/dashboard" element={
             <UserRoute>
-              <MainLayout>
+              <MainLayout showNav={false}>
                 <Dashboard />
               </MainLayout>
             </UserRoute>
           } />
           <Route path="/workout" element={
             <UserRoute>
-              <MainLayout>
+              <MainLayout showNav={false}>
                 <WorkoutPage />
               </MainLayout>
             </UserRoute>
           } />
           <Route path="/meals" element={
             <UserRoute>
-              <MainLayout>
+              <MainLayout showNav={false}>
                 <MealsPage />
               </MainLayout>
             </UserRoute>
           } />
           <Route path="/calculator" element={
-            <MainLayout>
+            <MainLayout showNav={false}>
               <CalculatorPage />
             </MainLayout>
           } />
