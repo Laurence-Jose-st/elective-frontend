@@ -106,6 +106,41 @@ body {
   color: var(--color-off-black) !important;
 }
 
+/* Custom tab button styling */
+.btn-tab-inactive {
+  color: var(--color-off-white) !important;
+  border-color: transparent !important;
+  background-color: transparent !important;
+}
+
+.btn-tab-inactive:hover {
+  color: var(--color-pure-white) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Bootstrap Tabs dark theme */
+.nav-tabs .nav-link {
+  color: var(--color-off-white) !important;
+  background-color: var(--color-charcoal) !important;
+  border-color: var(--color-charcoal) !important;
+}
+
+.nav-tabs .nav-link:hover {
+  color: var(--color-pure-white) !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: var(--color-charcoal) !important;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--color-off-black) !important;
+  background-color: var(--color-neon-yellow) !important;
+  border-color: var(--color-neon-yellow) !important;
+}
+
+.nav-tabs .nav-item .nav-link {
+  border-radius: 0 !important;
+}
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;  
@@ -475,3 +510,4 @@ h6, h2, h3, h5, span, i, label, input, select {
   font-weight: 400;
   font-style: normal;
 }
+
