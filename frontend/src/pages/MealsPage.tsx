@@ -361,12 +361,12 @@ function MealsPage() {
                                 fiber={dailyTotals.fiber}
                             />
                         ) : (
-                            <div className="card bg-charcoal border-0">
+                            <div className="card bg-slate-900 border border-slate-800">
                                 <div className="card-body text-center py-5">
-                                    <h3 className="mb-3 text-neon-yellow">{dailyTotals.calories} kcal</h3>
-                                    <p className="text-off-white">Total Calories Today</p>
-                                    <Alert variant="info" className="mt-3 bg-charcoal text-pure-white">
-                                        <small className="text-off-white">Detailed macro breakdown (Protein, Carbs, Fats, Fiber) is available for registered users only.</small>
+                                    <h3 className="mb-3 text-neon-green">{dailyTotals.calories} kcal</h3>
+                                    <p className="text-slate-300">Total Calories Today</p>
+                                    <Alert variant="info" className="mt-3 bg-charcoal text-slate-300">
+                                        <small className="text-slate-300">Detailed macro breakdown (Protein, Carbs, Fats, Fiber) is available for registered users only.</small>
                                     </Alert>
                                 </div>
                             </div>
@@ -439,14 +439,14 @@ function MealsPage() {
 
                                             return (
                                                 <div key={category} className="col-12 mb-3">
-                                                    <h5 className="text-capitalize mb-2 text-neon-yellow">{category}</h5>
+                                                    <h5 className="text-capitalize mb-2 text-neon-green">{category}</h5>
                                                     {categoryMeals.map((meal: any) => (
-                                                        <div key={meal.id} className="card mb-2 border-0 bg-charcoal">
+                                                        <div key={meal.id} className="card mb-2 border-0 bg-slate-900 border border-slate-800">
                                                             <div className="card-body py-2">
                                                                 <div className="d-flex text-fonts justify-content-between align-items-center">
-                                                                    <div>
+                                                                    <div className="text-pure-white">
                                                                         <strong>{meal.food_name}</strong>
-                                                                        <small className="text-fonts text-muted d-block">
+                                                                        <small className="text-fonts text-slate-300 d-block">
                                                                             {user ? (
                                                                                 <>
                                                                                     {meal.calories} kcal • P: {meal.protein}g • C: {meal.carbs}g • F: {meal.fats}g
@@ -459,9 +459,9 @@ function MealsPage() {
                                                                         </small>
                                                                     </div>
                                                                     {user && (
-                                                                        <>
+                                                                        <div className="d-flex gap-1">
                                                                             <button
-                                                                                className="btn btn-sm btn-outline-primary me-1"
+                                                                                className="btn btn-sm btn-outline-primary"
                                                                                 onClick={() => handleEditMeal(meal)}
                                                                             >
                                                                                 <i className="bi bi-pencil"></i>
@@ -472,7 +472,7 @@ function MealsPage() {
                                                                             >
                                                                                 <i className="bi bi-trash"></i>
                                                                             </button>
-                                                                        </>
+                                                                        </div>
                                                                     )}
                                                                 </div>
                                                             </div>
@@ -483,7 +483,7 @@ function MealsPage() {
                                         })
                                     })()}
                                     {loggedMeals.filter((meal: any) => new Date(meal.created_at).toDateString() === new Date().toDateString()).length === 0 && (
-                                        <div className="col-12 text-center text-muted py-4">
+                                        <div className="col-12 text-center text-slate-300 py-4">
                                             No meals logged today. Click "Log Meal" to add your first meal.
                                         </div>
                                     )}
@@ -509,7 +509,7 @@ function MealsPage() {
 
                                         if (sortedDates.length === 0) {
                                             return (
-                                                <div className="col-12 text-center text-muted py-4">
+                                                <div className="col-12 text-center text-slate-300 py-4">
                                                     No meal history available yet.
                                                 </div>
                                             )
@@ -528,7 +528,7 @@ function MealsPage() {
                                                                     {date === new Date().toDateString() && (
                                                                         <span className="badge bg-primary ms-2">Today</span>
                                                                     )}
-                                                                    <span className="text-muted ms-3 small">
+                                                                    <span className="text-slate-300 ms-3 small">
                                                                         {mealsByDate[date].length} meal{mealsByDate[date].length !== 1 ? 's' : ''}
                                                                     </span>
                                                                 </span>
@@ -536,21 +536,20 @@ function MealsPage() {
                                                         </Accordion.Header>
                                                         <Accordion.Body>
                                                             {mealsByDate[date].map((meal: any) => (
-                                                                <div key={meal.id} className="card mb-2 border-0 bg-light">
+                                                                <div key={meal.id} className="card mb-2 border-0 bg-slate-900 border border-slate-800">
                                                                     <div className="card-body py-2">
                                                                         <div className="d-flex text-fonts justify-content-between align-items-center">
-                                                                            <div>
+                                                                            <div className="text-pure-white">
                                                                                 <strong>{meal.food_name}</strong>
-                                                                                <small className="text-fonts text-muted d-block">
+                                                                                <small className="text-fonts text-slate-300 d-block">
                                                                                     {meal.meal_type} • {meal.calories} kcal • P: {meal.protein}g • C: {meal.carbs}g • F: {meal.fats}g
                                                                                 </small>
                                                                             </div>
                                                                             {user && (
-                                                                                <>
+                                                                                <div className="d-flex gap-1">
                                                                                     <Button
                                                                                         variant="outline-primary"
                                                                                         size="sm"
-                                                                                        className="me-1"
                                                                                         onClick={() => handleEditMeal(meal)}
                                                                                     >
                                                                                         <i className="bi bi-pencil"></i>
@@ -562,7 +561,7 @@ function MealsPage() {
                                                                                     >
                                                                                         <i className="bi bi-plus-circle"></i> Copy
                                                                                     </Button>
-                                                                                </>
+                                                                                </div>
                                                                             )}
                                                                         </div>
                                                                     </div>
@@ -595,31 +594,30 @@ function MealsPage() {
                     fiber: 0
                 })
             }}>
-                <Modal.Header className="border-0" closeButton>
-                    <Modal.Title>Add Meal</Modal.Title>
+                <Modal.Header className="border-0 bg-slate-900 border-b border-slate-800" closeButton>
+                    <Modal.Title className="text-pure-white">Add Meal</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body className="bg-slate-900">
                     <form onSubmit={handleSubmit}>
                         <div className="mb-3 position-relative">
                             <input
                                 type="text"
-                                className="form-control border-0 border-bottom"
+                                className="form-control border-0 border-bottom bg-slate-800 text-pure-white"
                                 placeholder="Search meals or type custom food name..."
                                 value={searchQuery}
                                 onChange={(e) => handleSearch(e.target.value)}
                                 autoComplete="off"
                             />
                             {searchResults.length > 0 && (
-                                <div className="position-absolute w-100 bg-white border rounded shadow-lg mt-1" style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
+                                <div className="position-absolute w-100 bg-slate-900 border border-slate-800 rounded shadow-lg mt-1" style={{ zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}>
                                     {searchResults.map((food) => (
                                         <div
                                             key={food.id}
-                                            className="p-2 search-result-item"
+                                            className="p-2 mb-2 border-b border-slate-800 last:border-b-0 hover:border-emerald-500/50 hover:bg-slate-800 transition-all cursor-pointer"
                                             onClick={() => handleFoodSelect(food)}
-                                            style={{ cursor: 'pointer' }}
                                         >
-                                            <div className="text-fonts fw-bold">{food.name}</div>
-                                            <small className="text-fonts text-muted">
+                                            <div className="text-fonts fw-bold text-pure-white">{food.name}</div>
+                                            <small className="text-fonts text-slate-300">
                                                 {food.category} • {Math.round(food.calories)} kcal per 100g
                                             </small>
                                         </div>
@@ -627,40 +625,33 @@ function MealsPage() {
                                 </div>
                             )}
                             {isSearching && (
-                                <div className="position-absolute w-100 bg-white border rounded shadow-lg mt-1 p-2 text-fonts text-muted" style={{ zIndex: 1000 }}>
+                                <div className="position-absolute w-100 bg-slate-800 border border-slate-700 rounded shadow-lg mt-1 p-2 text-fonts text-slate-300" style={{ zIndex: 1000 }}>
                                     Searching...
                                 </div>
                             )}
                             {!selectedFood && searchQuery && searchResults.length === 0 && !isSearching && (
-                                <div className="position-absolute w-100 bg-warning bg-opacity-10 border border-warning rounded shadow-lg mt-1 p-2 text-fonts text-muted" style={{ zIndex: 1000 }}>
-                                    <small>No results found. You can add "{searchQuery}" as a custom food.</small>
+                                <div className="position-absolute w-100 bg-slate-800 border border-emerald-500/30 rounded shadow-lg mt-1 p-2 text-fonts text-slate-300" style={{ zIndex: 1000 }}>
+                                    <small>No results found. Adding "{searchQuery}" as custom food - enter nutritional values below.</small>
                                 </div>
                             )}
                         </div>
                         {selectedFood && (
-                            <div className="mb-3 p-2 bg-light rounded">
-                                <small className="text-fonts text-muted">
-                                    <strong>Selected:</strong> {selectedFood.name} ({selectedFood.category})
-                                </small>
-                            </div>
-                        )}
-                        {!selectedFood && searchQuery && (
-                            <div className="mb-3 p-2 bg-info bg-opacity-10 border border-info rounded">
-                                <small className="text-fonts text-muted">
-                                    <strong>Custom Food:</strong> "{searchQuery}" - Enter nutritional values below
+                            <div className="mb-3 p-2 bg-slate-800 border border-slate-700 rounded">
+                                <small className="text-fonts text-slate-300">
+                                    <strong className="text-pure-white">Selected:</strong> {selectedFood.name} ({selectedFood.category})
                                 </small>
                             </div>
                         )}
                         {selectedFood && (
                             <div className="mb-4">
-                                <div className="card border-0">
+                                <div className="card border-0 bg-slate-800 border border-slate-700">
                                     <div className="card-body">
-                                        <label className="form-label">Portion Weight (grams)</label>
+                                        <label className="form-label text-pure-white">Portion Weight (grams)</label>
                                         <div className="">
                                             <div className="d-flex gap-2 align-items-center">
                                                 <input
                                                     type="number"
-                                                    className={`form-control border-0 border-bottom ${validationErrors.portionWeight ? 'border-danger' : ''}`}
+                                                    className={`form-control border-0 border-bottom bg-slate-700 text-pure-white ${validationErrors.portionWeight ? 'border-danger' : ''}`}
                                                     value={formValues.portionWeight}
                                                     onChange={(e) => {
                                                         const value = Number(e.target.value)
@@ -671,7 +662,7 @@ function MealsPage() {
                                                     max="10000"
                                                     style={{ width: '150px' }}
                                                 />
-                                                <span>grams</span>
+                                                <span className="text-slate-300">grams</span>
                                             </div>
                                             {validationErrors.portionWeight && (
                                                 <small className="text-danger">{validationErrors.portionWeight}</small>
@@ -681,14 +672,14 @@ function MealsPage() {
                                 </div>
                             </div>
                         )}
-                        <div className="card border-0">
+                        <div className="card border-0 bg-slate-800 border border-slate-700">
                             <div className="card-body">
                                 <div className="row">
                                     <div className="col-6 mb-3">
                                         <div className="mb-3">
-                                            <label htmlFor="mealCategory" className="form-label">Meal Category</label>
+                                            <label htmlFor="mealCategory" className="form-label text-pure-white">Meal Category</label>
                                             <select
-                                                className="form-select border-0 border-bottom"
+                                                className="form-select border-0 border-bottom bg-slate-700 text-pure-white"
                                                 id="mealCategory"
                                                 value={mealCategory}
                                                 onChange={(e) => setMealCategory(e.target.value)}
@@ -702,11 +693,10 @@ function MealsPage() {
 
                                     </div>
                                     <div className="col-6 mb-3">
-                                        <label htmlFor="calories" className="form-label" style={{ color: 'purple' }}>Total Calories (kcal)</label>
+                                        <label htmlFor="calories" className="form-label text-pure-white">Total Calories (kcal)</label>
                                         <input
                                             type="number"
-                                            className={`form-control border-0 border-bottom ${validationErrors.calories ? 'border-danger' : ''}`}
-                                            style={{ color: 'purple' }}
+                                            className={`form-control border-0 border-bottom bg-slate-700 text-pure-white ${validationErrors.calories ? 'border-danger' : ''}`}
                                             id="calories"
                                             value={formValues.calories}
                                             onChange={(e) => {
@@ -721,11 +711,10 @@ function MealsPage() {
                                         {validationErrors.calories && <small className="text-danger">{validationErrors.calories}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
-                                        <label htmlFor="protein" className="form-label" style={{ color: 'blue' }}>Protein (g)</label>
+                                        <label htmlFor="protein" className="form-label text-pure-white">Protein (g)</label>
                                         <input
                                             type="number"
-                                            className={`form-control border-0 border-bottom ${validationErrors.protein ? 'border-danger' : ''}`}
-                                            style={{ color: 'blue' }}
+                                            className={`form-control border-0 border-bottom bg-slate-700 text-pure-white ${validationErrors.protein ? 'border-danger' : ''}`}
                                             id="protein"
                                             value={formValues.protein}
                                             onChange={(e) => {
@@ -740,11 +729,10 @@ function MealsPage() {
                                         {validationErrors.protein && <small className="text-danger">{validationErrors.protein}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
-                                        <label htmlFor="carbs" className="form-label" style={{ color: 'orange' }}>Carbohydrates (g)</label>
+                                        <label htmlFor="carbs" className="form-label text-pure-white">Carbohydrates (g)</label>
                                         <input
                                             type="number"
-                                            className={`form-control border-0 border-bottom ${validationErrors.carbs ? 'border-danger' : ''}`}
-                                            style={{ color: 'orange' }}
+                                            className={`form-control border-0 border-bottom bg-slate-700 text-pure-white ${validationErrors.carbs ? 'border-danger' : ''}`}
                                             id="carbs"
                                             value={formValues.carbs}
                                             onChange={(e) => {
@@ -759,11 +747,10 @@ function MealsPage() {
                                         {validationErrors.carbs && <small className="text-danger">{validationErrors.carbs}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
-                                        <label htmlFor="fats" className="form-label" style={{ color: 'red' }}>Fats (g)</label>
+                                        <label htmlFor="fats" className="form-label text-pure-white">Fats (g)</label>
                                         <input
                                             type="number"
-                                            className={`form-control border-0 border-bottom ${validationErrors.fats ? 'border-danger' : ''}`}
-                                            style={{ color: 'red' }}
+                                            className={`form-control border-0 border-bottom bg-slate-700 text-pure-white ${validationErrors.fats ? 'border-danger' : ''}`}
                                             id="fats"
                                             value={formValues.fats}
                                             onChange={(e) => {
@@ -778,11 +765,10 @@ function MealsPage() {
                                         {validationErrors.fats && <small className="text-danger">{validationErrors.fats}</small>}
                                     </div>
                                     <div className="col-6 mb-3">
-                                        <label htmlFor="fiber" className="form-label" style={{ color: 'green' }}>Dietary Fiber (g)</label>
+                                        <label htmlFor="fiber" className="form-label text-pure-white">Dietary Fiber (g)</label>
                                         <input
                                             type="number"
-                                            className={`form-control border-0 border-bottom ${validationErrors.fiber ? 'border-danger' : ''}`}
-                                            style={{ color: 'green' }}
+                                            className={`form-control border-0 border-bottom bg-slate-700 text-pure-white ${validationErrors.fiber ? 'border-danger' : ''}`}
                                             id="fiber"
                                             value={formValues.fiber}
                                             onChange={(e) => {
@@ -800,9 +786,9 @@ function MealsPage() {
                             </div>
                         </div>
                         <div className="text-center">
-                            <button 
-                                type="submit" 
-                                className="btn btn-font btn-primary mb-2" 
+                            <button
+                                type="submit"
+                                className="btn btn-font btn-primary mb-2"
                                 style={{ padding: '10px 20px', fontSize: '16px'}}
                                 disabled={isSubmitting}
                             >

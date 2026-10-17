@@ -70,6 +70,9 @@ function WorkoutPage() {
   const [refreshCharts, setRefreshCharts] = useState(0)
   const [previousWorkout, setPreviousWorkout] = useState<any>(null)
 
+  // Ref for click outside detection
+  const searchContainerRef = useRef<HTMLDivElement>(null)
+
   // Session Title Options
   const [sessionTitle, setSessionTitle] = useState('')
   const [sessionNotes, setSessionNotes] = useState('')
@@ -148,6 +151,20 @@ function WorkoutPage() {
   useEffect(() => {
     fetchWorkoutHistory()
     fetchCompletedSessions()
+  }, [])
+
+  // Click outside to close search dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        setSearchResults([])
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
   }, [])
 
   const fetchWorkoutHistory = async () => {
@@ -576,12 +593,12 @@ function WorkoutPage() {
         <div className="container mt-4">
           <div className="row">
             <div className="col-12">
-              <div className="card bg-charcoal border-0" style={{ minHeight: '300px' }}>
+              <div className="card bg-slate-900 border border-slate-800" style={{ minHeight: '300px' }}>
                 <div className="card-body d-flex flex-column">
                   {!user ? (
-                    <Alert variant="warning" className="text-center bg-charcoal text-pure-white">
-                      <h5 className="text-neon-yellow">Guest Mode</h5>
-                      <p className="mb-2 text-off-white">You can view workout history, but logging new workouts requires an account.</p>
+                    <Alert variant="warning" className="text-center bg-slate-900 text-pure-white border-slate-800">
+                      <h5 className="text-neon-green">Guest Mode</h5>
+                      <p className="mb-2 text-slate-300">You can view workout history, but logging new workouts requires an account.</p>
                       <button
                         className="btn btn-primary btn-sm"
                         onClick={() => window.location.href = '/login'}
@@ -619,7 +636,7 @@ function WorkoutPage() {
 
                       {/* Duration Tracking */}
                       <div className="mb-3">
-                        <label className="form-label fw-bold">Duration Tracking</label>
+                        <label className="form-label fw-bold text-light">Duration Tracking</label>
                         <ButtonGroup className="mb-3 w-100">
                           <Button
                             variant={durationMode === 'timer' ? 'primary' : 'outline-primary'}
@@ -636,8 +653,8 @@ function WorkoutPage() {
                         </ButtonGroup>
 
                         {durationMode === 'timer' ? (
-                          <div className="text-center py-3 bg-light rounded">
-                            <h2 className="display-4 fw-bold mb-3">{formatTimer(timerSeconds)}</h2>
+                          <div className="text-center py-3 bg-slate-900 border border-slate-800 rounded">
+                            <h2 className="display-4 fw-bold mb-3 text-pure-white">{formatTimer(timerSeconds)}</h2>
                             <div className="d-flex justify-content-center gap-2">
                               <Button variant="success" onClick={handleTimerStart} disabled={isTimerRunning}>
                                 Start
@@ -719,8 +736,8 @@ function WorkoutPage() {
                           onClick={() => setShowModal(true)}
                           style={{ cursor: 'pointer' }}
                         >
-                          <span className="text-primary">Add Exercise</span>
-                          <i className="bi bi-plus-lg text-primary"></i>
+                          <span className="text-neon-green fw-bold">Add Exercise</span>
+                          <i className="bi bi-plus-lg text-neon-green"></i>
                         </div>
                         {sessionExercises.length > 0 && sessionExercises.map((exercise, exerciseIdx) => (
                           <div
@@ -728,7 +745,7 @@ function WorkoutPage() {
                             className="list-group-item"
                           >
                             <div className="d-flex justify-content-between align-items-center mb-2">
-                              <div className="fw-bold">
+                              <div className="fw-bold text-pure-white">
                                 {exercise.exerciseName}
                                 {exercise.isCustom && <Badge bg="secondary" className="ms-2">Custom</Badge>}
                               </div>
@@ -744,16 +761,16 @@ function WorkoutPage() {
                                 <i className="bi bi-trash"></i>
                               </Button>
                             </div>
-                            <small className="text-muted">
+                            <small className="text-slate-400">
                               {exercise.bodyPart} • {exercise.equipment}
                             </small>
                             {exercise.notes && (
-                              <small className="text-muted d-block mt-1">Note: {exercise.notes}</small>
+                              <small className="text-slate-400 d-block mt-1">Note: {exercise.notes}</small>
                             )}
                             <div className="mt-2">
                               {exercise.sets.map((set, setIdx) => (
                                 <div key={set.id} className="d-flex gap-2 align-items-center mb-1">
-                                  <span className="text-muted small">Set {set.setNumber}:</span>
+                                  <span className="text-slate-300 small">Set {set.setNumber}:</span>
                                   <Form.Control
                                     type="number"
                                     size="sm"
@@ -769,10 +786,10 @@ function WorkoutPage() {
                                     min="0"
                                     max="2000"
                                     style={{ width: '80px' }}
-                                    className={validationErrors[`weight-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}
+                                    className={`bg-slate-700 text-pure-white border-0 border-bottom ${validationErrors[`weight-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}`}
                                   />
-                                  <span className="text-muted small">{weightUnit}</span>
-                                  <span className="text-muted small">x</span>
+                                  <span className="text-slate-300 small">{weightUnit}</span>
+                                  <span className="text-slate-300 small">x</span>
                                   <Form.Control
                                     type="number"
                                     size="sm"
@@ -788,7 +805,7 @@ function WorkoutPage() {
                                     min="1"
                                     max="100"
                                     style={{ width: '70px' }}
-                                    className={validationErrors[`reps-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}
+                                    className={`bg-slate-700 text-pure-white border-0 border-bottom ${validationErrors[`reps-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}`}
                                   />
                                   {validationErrors[`weight-${exerciseIdx}-${setIdx}`] && (
                                     <small className="text-danger" style={{ fontSize: '0.7rem' }}>
@@ -800,7 +817,7 @@ function WorkoutPage() {
                                       {validationErrors[`reps-${exerciseIdx}-${setIdx}`]}
                                     </small>
                                   )}
-                                  <span className="text-muted small">reps</span>
+                                  <span className="text-slate-300 small">reps</span>
                                   <Form.Check
                                     type="checkbox"
                                     label="Warmup"
@@ -848,7 +865,7 @@ function WorkoutPage() {
 
                       {/* Session Notes - Moved to Bottom */}
                       <div className="mt-3 pt-3 border-top">
-                        <label className="form-label fw-bold">Session Notes (Optional)</label>
+                        <label className="form-label fw-bold text-light">Session Notes (Optional)</label>
                         <Form.Control
                           as="textarea"
                           rows={2}
@@ -896,16 +913,16 @@ function WorkoutPage() {
         <div className="container mt-4">
           <div className="row">
             <div className="col-12">
-              <div className="card bg-charcoal border-0">
+              <div className="card bg-slate-900 border border-slate-800">
                 <div className="card-body">
                   <h5 className="mb-4 text-pure-white">Workout History</h5>
                   {!user ? (
-                    <Alert variant="info" className="bg-charcoal text-pure-white">
-                      <p className="mb-0 text-off-white">Login to view your workout history.</p>
+                    <Alert variant="info" className="bg-charcoal text-slate-300">
+                      <p className="mb-0">Login to view your workout history.</p>
                     </Alert>
                   ) : completedSessions.length === 0 ? (
-                    <Alert variant="info">
-                      <p className="mb-0">No completed workout sessions yet.</p>
+                    <Alert variant="info" className="bg-charcoal text-slate-300">
+                      <p className="mb-0">No completed workout sessions yet. Start logging your workouts!</p>
                     </Alert>
                   ) : (
                     (() => {
@@ -935,7 +952,7 @@ function WorkoutPage() {
                                     {date === new Date().toDateString() && (
                                       <span className="badge bg-primary ms-2">Today</span>
                                     )}
-                                    <span className="text-muted ms-3 small">
+                                    <span className="text-slate-300 ms-3 small">
                                       {sessionsByDate[date].length} session{sessionsByDate[date].length !== 1 ? 's' : ''}
                                     </span>
                                   </span>
@@ -945,38 +962,38 @@ function WorkoutPage() {
                                 <Accordion flush>
                                   {sessionsByDate[date].map((session: any, idx: number) => (
                                     <Accordion.Item eventKey={`${date}-${idx}`} key={session.id}>
-                                      <Accordion.Header className="bg-light border">
+                                      <Accordion.Header className="bg-slate-800 border-slate-700">
                                         <div className="d-flex justify-content-between align-items-center w-100 me-3">
                                           <div>
-                                            <strong>{session.name}</strong>
-                                            <small className="text-muted ms-3">
+                                            <strong className="text-pure-white">{session.name}</strong>
+                                            <small className="text-slate-300 ms-3">
                                               {new Date(session.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                                             </small>
                                           </div>
                                           <Badge bg="primary">{formatDuration(session.duration_seconds)}</Badge>
                                         </div>
                                       </Accordion.Header>
-                                      <Accordion.Body>
+                                      <Accordion.Body className="bg-slate-900">
                                         {(() => {
                                           const parsedNotes = parseSessionNotes(session.notes)
                                           return parsedNotes && (
-                                            <div className="mb-3 p-2 bg-light rounded">
-                                              <small className="text-muted">Notes: {parsedNotes}</small>
+                                            <div className="mb-3 p-2 bg-slate-800 border border-slate-700 rounded">
+                                              <small className="text-slate-300">Notes: {parsedNotes}</small>
                                             </div>
                                           )
                                         })()}
                                         {session.session_exercises && session.session_exercises.length > 0 && (
                                           <div className="list-group">
                                             {session.session_exercises.map((se: any) => (
-                                              <div key={se.id} className="list-group-item">
-                                                <div className="fw-bold">{se.exercises?.name || 'Exercise'}</div>
-                                                <small className="text-muted">
+                                              <div key={se.id} className="list-group-item bg-slate-800 border-slate-700 text-pure-white">
+                                                <div className="fw-bold text-pure-white">{se.exercises?.name || 'Exercise'}</div>
+                                                <small className="text-slate-400">
                                                   {se.body_part} • {se.equipment}
                                                 </small>
                                                 {se.workout_sets && se.workout_sets.length > 0 && (
                                                   <div className="mt-2">
                                                     {se.workout_sets.map((set: any) => (
-                                                      <div key={set.id} className="small text-muted">
+                                                      <div key={set.id} className="small text-slate-200">
                                                         Set {set.setNumber}: {set.weight} {se.weight_unit || 'lbs'} × {set.reps} reps
                                                         {set.is_warmup && <Badge bg="warning" className="ms-2">Warmup</Badge>}
                                                       </div>
@@ -1019,17 +1036,17 @@ function WorkoutPage() {
         <div className="container mt-4">
           <div className="row">
             <div className="col-12">
-              <div className="card border-0">
+              <div className="card border-0 dark-card">
                 <div className="card-body">
-                  <h5 className="mb-4">Progressive Overload</h5>
+                  <h5 className="mb-4 text-pure-white">Progressive Overload</h5>
                   {!user ? (
-                    <Alert variant="info">
+                    <Alert variant="info" className="bg-charcoal text-slate-300">
                       <p className="mb-0">Login to view your progressive overload data.</p>
                     </Alert>
                   ) : (
                     <>
                       <div className="mb-4">
-                        <label className="form-label fw-bold">Select Exercise</label>
+                        <label className="form-label fw-bold text-pure-white">Select Exercise</label>
                         <Form.Select
                           value={selectedExerciseForProgression}
                           onChange={(e) => {
@@ -1046,21 +1063,21 @@ function WorkoutPage() {
 
                       {/* Suggested Challenge Card */}
                       {selectedExerciseForProgression !== 'all' && previousWorkout && previousWorkout[selectedExerciseForProgression] && (
-                        <div className="mb-4 p-3 bg-success bg-opacity-10 border border-success rounded">
-                          <h6 className="fw-bold text-success">🎯 Suggested Challenge</h6>
-                          <div className="mb-2 text-muted small">Exercise: {selectedExerciseForProgression}</div>
+                        <div className="mb-4 p-3 bg-slate-800 border border-emerald-500/30 rounded">
+                          <h6 className="fw-bold text-neon-green">🎯 Suggested Challenge</h6>
+                          <div className="mb-2 text-slate-300 small font-semibold">Exercise: {selectedExerciseForProgression}</div>
                           {(() => {
                             const challenge = calculateSuggestedChallenge(selectedExerciseForProgression)
                             if (!challenge) return null
                             return (
                               <div>
-                                <p className="mb-2">
-                                  <strong>Last Session:</strong> {challenge.lastWeight} {weightUnit} × {challenge.lastReps} reps
+                                <p className="mb-2 text-slate-200">
+                                  <strong className="text-pure-white">Last Session:</strong> <span className="text-white font-semibold">{challenge.lastWeight} {weightUnit} × {challenge.lastReps} reps</span>
                                 </p>
-                                <p className="mb-2">
-                                  <strong>Target for Today:</strong> {challenge.suggestedWeight} {weightUnit} × {challenge.suggestedReps} reps
+                                <p className="mb-2 text-slate-200">
+                                  <strong className="text-pure-white">Target for Today:</strong> <span className="text-white font-semibold">{challenge.suggestedWeight} {weightUnit} × {challenge.suggestedReps} reps</span>
                                 </p>
-                                <p className="mb-0 text-muted small">
+                                <p className="mb-0 text-slate-300 small">
                                   💡 {challenge.recommendation}
                                 </p>
                               </div>
@@ -1072,23 +1089,23 @@ function WorkoutPage() {
                       {progressiveOverloadData ? (
                         <div>
                           {progressiveOverloadData.currentPR && (
-                            <div className="mb-4 p-3 bg-light rounded">
-                              <h6 className="fw-bold">Current Personal Record</h6>
+                            <div className="mb-4 p-3 bg-slate-900 border border-slate-800 rounded">
+                              <h6 className="fw-bold text-pure-white">Current Personal Record</h6>
                               {progressiveOverloadData.currentPR.exerciseName && (
-                                <p className="mb-2 text-muted small">Exercise: {progressiveOverloadData.currentPR.exerciseName}</p>
+                                <p className="mb-2 text-slate-300 small">Exercise: {progressiveOverloadData.currentPR.exerciseName}</p>
                               )}
                               <div className="d-flex gap-4">
                                 <div>
-                                  <small className="text-muted">Weight</small>
-                                  <div className="fw-bold">{progressiveOverloadData.currentPR.weight} lbs</div>
+                                  <small className="text-slate-300">Weight</small>
+                                  <div className="fw-bold text-pure-white">{progressiveOverloadData.currentPR.weight} lbs</div>
                                 </div>
                                 <div>
-                                  <small className="text-muted">Reps</small>
-                                  <div className="fw-bold">{progressiveOverloadData.currentPR.reps}</div>
+                                  <small className="text-slate-300">Reps</small>
+                                  <div className="fw-bold text-pure-white">{progressiveOverloadData.currentPR.reps}</div>
                                 </div>
                                 <div>
-                                  <small className="text-muted">Volume</small>
-                                  <div className="fw-bold">{progressiveOverloadData.currentPR.volume} lbs</div>
+                                  <small className="text-slate-300">Volume</small>
+                                  <div className="fw-bold text-pure-white">{progressiveOverloadData.currentPR.volume} lbs</div>
                                 </div>
                               </div>
                             </div>
@@ -1096,13 +1113,13 @@ function WorkoutPage() {
 
                           {progressiveOverloadData.metrics && progressiveOverloadData.metrics.length > 0 && (
                             <div className="mb-4">
-                              <h6 className="fw-bold mb-3">Recent Sessions</h6>
+                              <h6 className="fw-bold mb-3 text-pure-white">Recent Sessions</h6>
                               <div className="list-group">
                                 {progressiveOverloadData.metrics.map((metric: any, idx: number) => (
-                                  <div key={idx} className="list-group-item d-flex justify-content-between align-items-center">
+                                  <div key={idx} className="list-group-item d-flex justify-content-between align-items-center bg-slate-800 border-slate-700 text-pure-white">
                                     <div>
                                       <div className="fw-bold">{formatDate(metric.date)}</div>
-                                      <small className="text-muted">
+                                      <small className="text-slate-300">
                                         {metric.exerciseName ? `${metric.exerciseName}: ` : ''}
                                         {metric.weight} lbs × {metric.reps} reps × {metric.sets} sets
                                       </small>
@@ -1116,32 +1133,32 @@ function WorkoutPage() {
 
                           {progressiveOverloadData.improvements && progressiveOverloadData.improvements.length > 0 && (
                             <div>
-                              <h6 className="fw-bold mb-3">Progress</h6>
+                              <h6 className="fw-bold mb-3 text-pure-white">Progress</h6>
                               <div className="list-group">
                                 {progressiveOverloadData.improvements.map((improvement: any, idx: number) => (
-                                  <div key={idx} className="list-group-item">
+                                  <div key={idx} className="list-group-item bg-slate-800 border-slate-700 text-pure-white">
                                     <div className="fw-bold">
                                       {formatDate(improvement.date)}
                                       {improvement.exerciseName && (
-                                        <span className="text-muted ms-2">- {improvement.exerciseName}</span>
+                                        <span className="text-slate-300 ms-2">- {improvement.exerciseName}</span>
                                       )}
                                     </div>
                                     <div className="d-flex gap-3 mt-2">
                                       <div>
-                                        <small className="text-muted">Weight Change</small>
-                                        <div className={improvement.weightChange >= 0 ? 'text-success' : 'text-danger'}>
+                                        <small className="text-slate-300">Weight Change</small>
+                                        <div className={improvement.weightChange >= 0 ? 'text-neon-green' : 'text-danger'}>
                                           {improvement.weightChange >= 0 ? '+' : ''}{improvement.weightChange} lbs
                                         </div>
                                       </div>
                                       <div>
-                                        <small className="text-muted">Volume Change</small>
-                                        <div className={improvement.volumeChange >= 0 ? 'text-success' : 'text-danger'}>
+                                        <small className="text-slate-300">Volume Change</small>
+                                        <div className={improvement.volumeChange >= 0 ? 'text-neon-green' : 'text-danger'}>
                                           {improvement.volumeChange >= 0 ? '+' : ''}{improvement.volumeChange} lbs
                                         </div>
                                       </div>
                                       <div>
-                                        <small className="text-muted">Reps Change</small>
-                                        <div className={improvement.repsChange >= 0 ? 'text-success' : 'text-danger'}>
+                                        <small className="text-slate-300">Reps Change</small>
+                                        <div className={improvement.repsChange >= 0 ? 'text-neon-green' : 'text-danger'}>
                                           {improvement.repsChange >= 0 ? '+' : ''}{improvement.repsChange}
                                         </div>
                                       </div>
@@ -1153,7 +1170,7 @@ function WorkoutPage() {
                           )}
                         </div>
                       ) : (
-                        <Alert variant="info">
+                        <Alert variant="info" className="bg-slate-900 text-slate-300 border-slate-800">
                           <p className="mb-0">No progressive overload data available. Complete some workouts first!</p>
                         </Alert>
                       )}
@@ -1170,20 +1187,21 @@ function WorkoutPage() {
       <Modal show={showModal} size="lg" centered onHide={() => {
         setShowModal(false)
         setSelectedExercise(null)
+        setSelectedExercises([])
         setSearchQuery('')
         setSearchResults([])
       }}>
-        <Modal.Header className="border-0 mt-2 ms-3" closeButton>
-          <Modal.Title>Add Exercise to Session</Modal.Title>
+        <Modal.Header className="border-0 bg-slate-900 border-b border-slate-800" closeButton>
+          <Modal.Title className="text-pure-white">Add Exercise to Session</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <div className="card mb-2 border-0">
+        <Modal.Body className="bg-slate-900">
+          <div className="card mb-2 border-0 bg-slate-800 border border-slate-700">
             <div className="card-body">
-              <div className="mb-3 position-relative">
-                <label htmlFor="exerciseName" className="form-label">Exercise Name</label>
+              <div className="mb-3 position-relative" ref={searchContainerRef}>
+                <label htmlFor="exerciseName" className="form-label text-pure-white">Exercise Name</label>
                 <input
                   type="text"
-                  className="form-control border-0 border-bottom"
+                  className="form-control border-0 border-bottom bg-slate-700 text-pure-white"
                   id="exerciseName"
                   name="exerciseName"
                   placeholder="Search exercises or type custom name..."
@@ -1192,12 +1210,11 @@ function WorkoutPage() {
                   autoComplete="off"
                 />
                 {searchResults.length > 0 && (
-                  <div className="position-absolute w-100 bg-white border rounded shadow-lg mt-1" style={{ zIndex: 1000, maxHeight: '300px', overflowY: 'auto' }}>
+                  <div className="position-absolute w-100 bg-slate-900 border border-slate-800 rounded shadow-lg mt-1" style={{ zIndex: 1000, maxHeight: '300px', overflowY: 'auto' }}>
                     {searchResults.map((exercise) => (
                       <div
                         key={exercise.id}
-                        className="p-2 text-fonts search-result-item d-flex align-items-center"
-                        style={{ cursor: 'pointer' }}
+                        className="p-2 mb-2 border-b border-slate-800 last:border-b-0 hover:border-emerald-500/50 hover:bg-slate-800 transition-all cursor-pointer d-flex align-items-center"
                       >
                         <Form.Check
                           type="checkbox"
@@ -1207,8 +1224,8 @@ function WorkoutPage() {
                           onClick={(e) => e.stopPropagation()}
                         />
                         <div className="flex-grow-1" onClick={() => handleExerciseSelect(exercise)}>
-                          <div className="fw-bold">{exercise.name}</div>
-                          <small className="text-muted">
+                          <div className="fw-bold text-pure-white">{exercise.name}</div>
+                          <small className="text-slate-300">
                             {exercise.body_part} • {exercise.target} • {exercise.equipment}
                           </small>
                           {isExerciseInSession(exercise) && (
@@ -1220,15 +1237,15 @@ function WorkoutPage() {
                   </div>
                 )}
                 {isSearching && (
-                  <div className="position-absolute w-100 bg-white border rounded shadow-lg mt-1 p-2 text-muted" style={{ zIndex: 1000 }}>
+                  <div className="position-absolute w-100 bg-slate-800 border border-slate-700 rounded shadow-lg mt-1 p-2 text-slate-300" style={{ zIndex: 1000 }}>
                     Searching...
                   </div>
                 )}
               </div>
               {selectedExercises.length > 0 && (
-                <div className="mb-3 p-2 bg-light rounded">
-                  <small className="text-fonts text-muted">
-                    <strong>Selected:</strong> {selectedExercises.length} exercise(s)
+                <div className="mb-3 p-2 bg-slate-800 border border-slate-700 rounded">
+                  <small className="text-fonts text-slate-300">
+                    <strong className="text-pure-white">Selected:</strong> {selectedExercises.length} exercise(s)
                   </small>
                   <div className="mt-1">
                     {selectedExercises.map(e => (
@@ -1238,16 +1255,16 @@ function WorkoutPage() {
                 </div>
               )}
               {selectedExercise && selectedExercises.length === 0 && (
-                <div className="mb-3 p-2 bg-light rounded">
-                  <small className="text-fonts text-muted">
-                    <strong>Selected:</strong> {selectedExercise.name} ({selectedExercise.body_part} - {selectedExercise.equipment})
+                <div className="mb-3 p-2 bg-slate-800 border border-slate-700 rounded">
+                  <small className="text-fonts text-slate-300">
+                    <strong className="text-pure-white">Selected:</strong> {selectedExercise.name} ({selectedExercise.body_part} - {selectedExercise.equipment})
                   </small>
                 </div>
               )}
               {!selectedExercise && searchQuery && (
-                <div className="mb-3 p-2 bg-warning bg-opacity-10 border border-warning rounded">
-                  <small className="text-muted">
-                    <strong>Tip:</strong> Type a custom exercise name if not found in the database
+                <div className="mb-3 p-2 bg-slate-800 border border-emerald-500/30 rounded">
+                  <small className="text-fonts text-slate-300">
+                    <strong className="text-neon-green">Tip:</strong> Type a custom exercise name if not found in the database
                   </small>
                 </div>
               )}
