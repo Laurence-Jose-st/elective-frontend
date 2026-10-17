@@ -544,21 +544,24 @@ function WorkoutPage() {
         <div className="row align-items-center">
           <div className="col-12">
             <div className="d-flex justify-content-end">
-              <ButtonGroup>
+              <ButtonGroup className="bg-charcoal">
                 <Button
                   variant={activeTab === 'session' ? 'primary' : 'outline-primary'}
+                  className={`btn-font border-0 btn-size ${activeTab !== 'session' ? 'btn-tab-inactive' : ''}`}
                   onClick={() => setActiveTab('session')}
                 >
                   Session
                 </Button>
                 <Button
                   variant={activeTab === 'history' ? 'primary' : 'outline-primary'}
+                   className={`btn-font border-0 btn-size ${activeTab !== 'history' ? 'btn-tab-inactive' : ''}`}
                   onClick={() => setActiveTab('history')}
                 >
                   History
                 </Button>
                 <Button
                   variant={activeTab === 'progression' ? 'primary' : 'outline-primary'}
+                   className={`btn-font border-0 btn-size ${activeTab !== 'progression' ? 'btn-tab-inactive' : ''}`}
                   onClick={() => setActiveTab('progression')}
                 >
                   Progression
@@ -576,14 +579,15 @@ function WorkoutPage() {
         <div className="container mt-4">
           <div className="row">
             <div className="col-12">
-              <div className="card bg-charcoal border-0" style={{ minHeight: '300px' }}>
+              <div className="card bg-charcoal border-0" style={{ minHeight: '200px' }}>
                 <div className="card-body d-flex flex-column">
                   {!user ? (
-                    <Alert variant="warning" className="text-center bg-charcoal text-pure-white">
-                      <h5 className="text-neon-yellow">Guest Mode</h5>
-                      <p className="mb-2 text-off-white">You can view workout history, but logging new workouts requires an account.</p>
+                    <Alert variant="warning" className="text-center border-0 bg-charcoal text-pure-white">
+                      <h5 className="text-pure-white">Guest Mode</h5>
+                      <p className="mb-2 text-fonts text-off-white">You can view workout history, but logging new workouts requires an account.</p>
                       <button
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-font btn-primary"
+                        style={{ padding: '10px 20px', fontSize: '16px'}}
                         onClick={() => window.location.href = '/login'}
                       >
                         Login to Log Workouts
@@ -897,14 +901,14 @@ function WorkoutPage() {
           <div className="row">
             <div className="col-12">
               <div className="card bg-charcoal border-0">
-                <div className="card-body">
-                  <h5 className="mb-4 text-pure-white">Workout History</h5>
+                <div className="mt-3 card-body d-flex flex-column justify-content-center">
+                  <h5 className="text-pure-white text-center">Workout History</h5>
                   {!user ? (
-                    <Alert variant="info" className="bg-charcoal text-pure-white">
+                    <Alert variant="info" className="bg-charcoal border-0 text-pure-white text-center">
                       <p className="mb-0 text-off-white">Login to view your workout history.</p>
                     </Alert>
                   ) : completedSessions.length === 0 ? (
-                    <Alert variant="info">
+                    <Alert variant="info" className="bg-charcoal border-0 text-pure-white text-center">
                       <p className="mb-0">No completed workout sessions yet.</p>
                     </Alert>
                   ) : (
@@ -1020,10 +1024,10 @@ function WorkoutPage() {
           <div className="row">
             <div className="col-12">
               <div className="card border-0">
-                <div className="card-body">
-                  <h5 className="mb-4">Progressive Overload</h5>
+                <div className="card-body bg-charcoal border-0 d-flex flex-column justify-content-center">
+                  <h5 className="mt-3 text-pure-white text-center">Progressive Overload</h5>
                   {!user ? (
-                    <Alert variant="info">
+                    <Alert variant="info" className="bg-charcoal border-0 text-off-white text-center">
                       <p className="mb-0">Login to view your progressive overload data.</p>
                     </Alert>
                   ) : (
