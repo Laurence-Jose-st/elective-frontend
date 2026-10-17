@@ -62,7 +62,7 @@ function WorkoutCharts({ refreshTrigger = 0 }: WorkoutChartsProps) {
   if (chartData.length === 0) {
     return (
       <div style={{ width: '100%', height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p className="text-muted">No workout data available. Start logging your workouts!</p>
+        <p className="text-off-white">No workout data available. Start logging your workouts!</p>
       </div>
     )
   }
