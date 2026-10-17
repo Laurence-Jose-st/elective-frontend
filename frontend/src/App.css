@@ -1,6 +1,114 @@
+:root {
+  /* Color Palette */
+  --color-neon-yellow: #CEFE46;
+  --color-pure-white: #FFFFFF;
+  --color-off-white: #ecececb6;
+  --color-off-black: #121212;
+  --color-charcoal: #202020;
+}
+
+/* Color Palette Utilities */
+.bg-neon-yellow {
+  background-color: var(--color-neon-yellow) !important;
+}
+
+.bg-pure-white {
+  background-color: var(--color-pure-white) !important;
+}
+
+.bg-off-white {
+  background-color: var(--color-off-white) !important;
+}
+
+.bg-off-black {
+  background-color: var(--color-off-black) !important;
+}
+
+.bg-charcoal {
+  background-color: var(--color-charcoal) !important;
+}
+
+.text-neon-yellow {
+  color: var(--color-neon-yellow) !important;
+}
+
+.text-pure-white {
+  color: var(--color-pure-white) !important;
+}
+
+.text-off-white {
+  color: var(--color-off-white) !important;
+}
+
+.text-off-black {
+  color: var(--color-off-black) !important;
+}
+
+.text-charcoal {
+  color: var(--color-charcoal) !important;
+}
+
+/* Background for entire app */
+body {
+  background-color: var(--color-off-black);
+}
+
+/* Form inputs dark theme */
+.form-control,
+.form-select {
+  background-color: var(--color-charcoal) !important;
+  border-color: var(--color-neon-yellow) !important;
+  color: var(--color-pure-white) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  background-color: var(--color-charcoal) !important;
+  border-color: var(--color-neon-yellow) !important;
+  color: var(--color-pure-white) !important;
+  box-shadow: 0 0 0 0.25rem rgba(206, 254, 70, 0.25) !important;
+}
+
+.form-control::placeholder {
+  color: var(--color-off-white) !important;
+}
+
+/* Buttons dark theme */
+.btn-primary {
+  background-color: var(--color-neon-yellow) !important;
+  border-color: var(--color-neon-yellow) !important;
+  color: var(--color-off-black) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--color-off-white) !important;
+  border-color: var(--color-off-white) !important;
+  color: var(--color-off-black) !important;
+}
+
+.btn-outline-primary {
+  color: var(--color-neon-yellow) !important;
+  border-color: var(--color-neon-yellow) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--color-neon-yellow) !important;
+  color: var(--color-off-black) !important;
+}
+
+.btn-outline-danger {
+  color: var(--color-pure-white) !important;
+  border-color: var(--color-pure-white) !important;
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--color-pure-white) !important;
+  color: var(--color-off-black) !important;
+}
+
 .counter {
   font-size: 16px;
-  padding: 5px 10px;
+  padding: 5px 10px;  
   border-radius: 5px;
   color: var(--accent);
   background: var(--accent-bg);

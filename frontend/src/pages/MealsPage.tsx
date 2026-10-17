@@ -4,6 +4,7 @@ import { Modal, Alert, Tabs, Tab, Button, Accordion } from 'react-bootstrap'
 import MealsChart from '../components/MealsChart'
 import { mealService } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
+import Navigation from '../components/Navigation'
 import '../App.css'
 
 interface FoodItem {
@@ -339,11 +340,10 @@ function MealsPage() {
             <div className="container-fluid py-3 px-5">
                 <div className="row align-items-center">
                     <div className="col-4">
-                        <h1 className="mb-0 bbh-bartle-regular">Meal</h1>
+                        <h1 className="mb-0 bbh-bartle-regular text-pure-white">Meal</h1>
                     </div>
                     <div className="col-8">
-                        <div className="row">
-                        </div>
+                        <Navigation />
                     </div>
                 </div>
             </div>
@@ -351,7 +351,7 @@ function MealsPage() {
             <div className="container mt-4">
                 <div className="row">
                     <div className="col-12 ">
-                        <h2 className="mb-4">Nutrition Overview</h2>
+                        <h2 className="mb-4 text-pure-white">Nutrition Overview</h2>
                         {user ? (
                             <MealsChart
                                 calories={dailyTotals.calories}
@@ -361,12 +361,12 @@ function MealsPage() {
                                 fiber={dailyTotals.fiber}
                             />
                         ) : (
-                            <div className="card border-0">
+                            <div className="card bg-charcoal border-0">
                                 <div className="card-body text-center py-5">
-                                    <h3 className="mb-3">{dailyTotals.calories} kcal</h3>
-                                    <p className="text-muted">Total Calories Today</p>
-                                    <Alert variant="info" className="mt-3">
-                                        <small>Detailed macro breakdown (Protein, Carbs, Fats, Fiber) is available for registered users only.</small>
+                                    <h3 className="mb-3 text-neon-yellow">{dailyTotals.calories} kcal</h3>
+                                    <p className="text-off-white">Total Calories Today</p>
+                                    <Alert variant="info" className="mt-3 bg-charcoal text-pure-white">
+                                        <small className="text-off-white">Detailed macro breakdown (Protein, Carbs, Fats, Fiber) is available for registered users only.</small>
                                     </Alert>
                                 </div>
                             </div>
@@ -380,17 +380,17 @@ function MealsPage() {
 
 
             <div className="container mt-4">
-                <div className="card">
+                <div className="card bg-charcoal border-0">
                     <div className="card-body">
                         {!user && (
-                            <Alert variant="info" className="mb-3">
+                            <Alert variant="info" className="mb-3 bg-charcoal text-pure-white">
                                 <h6>Guest Mode</h6>
                                 <p className="mb-0">You can search for food items and view calorie information. To log meals and track detailed macros, please login or sign up.</p>
                             </Alert>
                         )}
                         <div className="row mb-3">
                             <div className="col-6">
-                                <h2>Meal Diary</h2>
+                                <h2 className="text-pure-white">Meal Diary</h2>
                             </div>
                             <div className="col-6 text-end">
                                 {user ? (
@@ -439,9 +439,9 @@ function MealsPage() {
 
                                             return (
                                                 <div key={category} className="col-12 mb-3">
-                                                    <h5 className="text-capitalize mb-2">{category}</h5>
+                                                    <h5 className="text-capitalize mb-2 text-neon-yellow">{category}</h5>
                                                     {categoryMeals.map((meal: any) => (
-                                                        <div key={meal.id} className="card mb-2 border-0 bg-light">
+                                                        <div key={meal.id} className="card mb-2 border-0 bg-charcoal">
                                                             <div className="card-body py-2">
                                                                 <div className="d-flex text-fonts justify-content-between align-items-center">
                                                                     <div>

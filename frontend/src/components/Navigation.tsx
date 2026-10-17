@@ -68,7 +68,7 @@ function Navigation() {
       <ul className="nav nav-underline justify-content-end align-items-center">
         {navItems.map((item) => (
           <li className="nav-item" key={item.path}>
-            <NavLink to={item.path} className="nav-link text-dark">
+            <NavLink to={item.path} className="nav-link text-pure-white">
               {item.label}
             </NavLink>
           </li>

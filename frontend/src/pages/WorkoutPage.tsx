@@ -5,6 +5,7 @@ import { Modal, Alert, Form, Button, ButtonGroup, Accordion, Badge } from 'react
 import '../App.css'
 import { workoutService } from '../services/api'
 import { useAuth } from '../contexts/AuthContext'
+import Navigation from '../components/Navigation'
 
 // Use web crypto API for UUID generation
 const randomUUID = () => {
@@ -531,9 +532,17 @@ function WorkoutPage() {
       <div className="container-fluid py-3 px-5">
         <div className="row align-items-center">
           <div className="col-4">
-            <h1 className="mb-0 bbh-bartle-regular">Workout</h1>
+            <h1 className="mb-0 bbh-bartle-regular text-pure-white">Workout</h1>
           </div>
           <div className="col-8">
+            <Navigation />
+          </div>
+        </div>
+      </div>
+
+      <div className="container-fluid py-3 px-5">
+        <div className="row align-items-center">
+          <div className="col-12">
             <div className="d-flex justify-content-end">
               <ButtonGroup>
                 <Button
@@ -567,12 +576,12 @@ function WorkoutPage() {
         <div className="container mt-4">
           <div className="row">
             <div className="col-12">
-              <div className="card border-0" style={{ minHeight: '300px' }}>
+              <div className="card bg-charcoal border-0" style={{ minHeight: '300px' }}>
                 <div className="card-body d-flex flex-column">
                   {!user ? (
-                    <Alert variant="warning" className="text-center">
-                      <h5>Guest Mode</h5>
-                      <p className="mb-2">You can view workout history, but logging new workouts requires an account.</p>
+                    <Alert variant="warning" className="text-center bg-charcoal text-pure-white">
+                      <h5 className="text-neon-yellow">Guest Mode</h5>
+                      <p className="mb-2 text-off-white">You can view workout history, but logging new workouts requires an account.</p>
                       <button
                         className="btn btn-primary btn-sm"
                         onClick={() => window.location.href = '/login'}
@@ -584,7 +593,7 @@ function WorkoutPage() {
                     <>
                       {/* Session Title Selection */}
                       <div className="mb-3">
-                        <label className="form-label fw-bold">Session Title</label>
+                        <label className="form-label fw-bold text-pure-white">Session Title</label>
                         <Form.Control
                           type="text"
                           list="sessionTitles"
@@ -887,12 +896,12 @@ function WorkoutPage() {
         <div className="container mt-4">
           <div className="row">
             <div className="col-12">
-              <div className="card border-0">
+              <div className="card bg-charcoal border-0">
                 <div className="card-body">
-                  <h5 className="mb-4">Workout History</h5>
+                  <h5 className="mb-4 text-pure-white">Workout History</h5>
                   {!user ? (
-                    <Alert variant="info">
-                      <p className="mb-0">Login to view your workout history.</p>
+                    <Alert variant="info" className="bg-charcoal text-pure-white">
+                      <p className="mb-0 text-off-white">Login to view your workout history.</p>
                     </Alert>
                   ) : completedSessions.length === 0 ? (
                     <Alert variant="info">
