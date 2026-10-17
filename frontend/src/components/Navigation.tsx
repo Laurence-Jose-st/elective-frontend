@@ -77,12 +77,12 @@ function Navigation() {
         {!user ? (
           <>
             <li className="nav-item">
-              <NavLink to="/login" className="nav-link text-dark">
+              <NavLink to="/login" className="nav-link auth-link">
                 Login
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink to="/signup" className="nav-link text-dark">
+              <NavLink to="/signup" className="nav-link auth-link">
                 Sign Up
               </NavLink>
             </li>

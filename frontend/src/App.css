@@ -1,15 +1,25 @@
 :root {
-  /* Color Palette */
-  --color-neon-yellow: #CEFE46;
+  /* Color Palette - Black and Neon Green Theme */
+  --color-neon-green: #22C55E;
+  --color-neon-green-light: #10B981;
   --color-pure-white: #FFFFFF;
   --color-off-white: #ecececb6;
   --color-off-black: #121212;
   --color-charcoal: #202020;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-zinc-900: #18181b;
+  --color-slate-300: #cbd5e1;
+  --color-gray-300: #d1d5db;
 }
 
 /* Color Palette Utilities */
-.bg-neon-yellow {
-  background-color: var(--color-neon-yellow) !important;
+.bg-neon-green {
+  background-color: var(--color-neon-green) !important;
+}
+
+.bg-neon-green-light {
+  background-color: var(--color-neon-green-light) !important;
 }
 
 .bg-pure-white {
@@ -28,8 +38,24 @@
   background-color: var(--color-charcoal) !important;
 }
 
-.text-neon-yellow {
-  color: var(--color-neon-yellow) !important;
+.bg-slate-800 {
+  background-color: var(--color-slate-800) !important;
+}
+
+.bg-slate-900 {
+  background-color: var(--color-slate-900) !important;
+}
+
+.bg-zinc-900 {
+  background-color: var(--color-zinc-900) !important;
+}
+
+.text-neon-green {
+  color: var(--color-neon-green) !important;
+}
+
+.text-neon-green-light {
+  color: var(--color-neon-green-light) !important;
 }
 
 .text-pure-white {
@@ -48,6 +74,14 @@
   color: var(--color-charcoal) !important;
 }
 
+.text-slate-300 {
+  color: var(--color-slate-300) !important;
+}
+
+.text-gray-300 {
+  color: var(--color-gray-300) !important;
+}
+
 /* Background for entire app */
 body {
   background-color: var(--color-off-black);
@@ -57,16 +91,16 @@ body {
 .form-control,
 .form-select {
   background-color: var(--color-charcoal) !important;
-  border-color: var(--color-neon-yellow) !important;
+  border-color: var(--color-neon-green) !important;
   color: var(--color-pure-white) !important;
 }
 
 .form-control:focus,
 .form-select:focus {
   background-color: var(--color-charcoal) !important;
-  border-color: var(--color-neon-yellow) !important;
+  border-color: var(--color-neon-green) !important;
   color: var(--color-pure-white) !important;
-  box-shadow: 0 0 0 0.25rem rgba(206, 254, 70, 0.25) !important;
+  box-shadow: 0 0 0 0.25rem rgba(34, 197, 94, 0.25) !important;
 }
 
 .form-control::placeholder {
@@ -75,24 +109,24 @@ body {
 
 /* Buttons dark theme */
 .btn-primary {
-  background-color: var(--color-neon-yellow) !important;
-  border-color: var(--color-neon-yellow) !important;
+  background-color: var(--color-neon-green) !important;
+  border-color: var(--color-neon-green) !important;
   color: var(--color-off-black) !important;
 }
 
 .btn-primary:hover {
-  background-color: var(--color-off-white) !important;
-  border-color: var(--color-off-white) !important;
+  background-color: var(--color-neon-green-light) !important;
+  border-color: var(--color-neon-green-light) !important;
   color: var(--color-off-black) !important;
 }
 
 .btn-outline-primary {
-  color: var(--color-neon-yellow) !important;
-  border-color: var(--color-neon-yellow) !important;
+  color: var(--color-neon-green) !important;
+  border-color: var(--color-neon-green) !important;
 }
 
 .btn-outline-primary:hover {
-  background-color: var(--color-neon-yellow) !important;
+  background-color: var(--color-neon-green) !important;
   color: var(--color-off-black) !important;
 }
 
@@ -294,20 +328,20 @@ body {
 /* Workout Page Styles */
 .workout-session-card {
   min-height: 250px;
-  background-color: #fafafa;
+  background-color: var(--color-slate-900);
   border-radius: 16px;
-  border: none;
+  border: 1px solid var(--color-slate-800);
 }
 
 .workout-session-card-body {
-  color: white;
+  color: var(--color-pure-white);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
 .workout-session-label {
-  color: #28a745;
+  color: var(--color-neon-green);
   text-transform: uppercase;
   font-size: 12px;
   letter-spacing: 1px;
@@ -318,16 +352,17 @@ body {
   font-size: 24px;
   font-weight: bold;
   margin-bottom: 16px;
+  color: var(--color-pure-white);
 }
 
 .workout-session-details {
-  color: #aaa;
+  color: var(--color-slate-300);
   font-size: 14px;
   margin-bottom: 8px;
 }
 
 .workout-session-icon-container {
-  background-color: #28a745;
+  background-color: var(--color-neon-green);
   border-radius: 12px;
   padding: 12px;
   width: 48px;
@@ -338,15 +373,15 @@ body {
 }
 
 .workout-session-start-btn {
-  background-color: #28a745;
-  color: white;
+  background-color: var(--color-neon-green);
+  color: var(--color-off-black);
   border-radius: 8px;
   font-weight: 500;
   align-self: flex-start;
 }
 
 .workout-session-empty {
-  color: white;
+  color: var(--color-pure-white);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -357,6 +392,54 @@ body {
   font-size: 20px;
   font-weight: bold;
   text-align: center;
+  color: var(--color-pure-white);
+}
+
+/* Dark card styling for history and progression */
+.dark-card {
+  background-color: var(--color-slate-900);
+  border: 1px solid var(--color-slate-800);
+  border-radius: 12px;
+}
+
+.dark-card .card-title {
+  color: var(--color-pure-white);
+}
+
+.dark-card .card-text {
+  color: var(--color-slate-300);
+}
+
+/* Light text for labels */
+.text-light {
+  color: var(--color-pure-white) !important;
+}
+
+.text-muted-light {
+  color: var(--color-slate-300) !important;
+}
+
+/* Navigation links for guest users */
+.nav-link {
+  color: var(--color-slate-300) !important;
+}
+
+.nav-link:hover {
+  color: var(--color-neon-green) !important;
+}
+
+.nav-link.active {
+  color: var(--color-neon-green) !important;
+}
+
+/* Login/Signup links for guests */
+.auth-link {
+  color: var(--color-neon-green) !important;
+  font-weight: 500;
+}
+
+.auth-link:hover {
+  color: var(--color-neon-green-light) !important;
 }
 
 .bbh-bartle-regular {
@@ -445,14 +528,92 @@ h6, h2, h3, h5, span, i, label, input, select {
   font-style: normal;
 }
 
-/* Exercise Search Results */
-.search-result-item {
-  cursor: pointer;
-  transition: background-color 0.2s;
+/* Search Results - handled inline in components */
+
+/* Tabs styling for dark theme */
+.nav-tabs .nav-link {
+  color: var(--color-slate-300) !important;
+  border: 1px solid transparent;
+  border-bottom: none;
+  padding: 10px 20px;
+  background-color: transparent !important;
 }
 
-.search-result-item:hover {
-  background-color: #f8f9fa;
+.nav-tabs .nav-link:hover {
+  color: var(--color-neon-green) !important;
+  border-color: var(--color-slate-800);
+  background-color: transparent !important;
+}
+
+.nav-tabs .nav-link.active {
+  color: var(--color-off-black) !important;
+  background-color: var(--color-neon-green) !important;
+  border-color: var(--color-neon-green) !important;
+  border-bottom-color: var(--color-neon-green) !important;
+  font-weight: 500;
+}
+
+.nav-tabs {
+  border-bottom: 1px solid var(--color-slate-800) !important;
+}
+
+/* Accordion styling for dark theme */
+.accordion-item {
+  background-color: var(--color-slate-900) !important;
+  border: 1px solid var(--color-slate-800) !important;
+  color: var(--color-pure-white);
+}
+
+.accordion-button {
+  background-color: var(--color-slate-900) !important;
+  color: var(--color-pure-white) !important;
+  border: none !important;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: var(--color-slate-800) !important;
+  color: var(--color-neon-green) !important;
+  box-shadow: none !important;
+}
+
+.accordion-button:focus {
+  box-shadow: none !important;
+  border-color: var(--color-neon-green) !important;
+}
+
+.accordion-button::after {
+  filter: brightness(0) invert(1);
+}
+
+.accordion-button:not(.collapsed)::after {
+  filter: brightness(0) invert(1);
+}
+
+.accordion-body {
+  background-color: var(--color-slate-900) !important;
+  color: var(--color-slate-300);
+}
+
+/* Alert styling for dark theme */
+.alert-info {
+  background-color: var(--color-slate-900) !important;
+  border-color: var(--color-slate-800) !important;
+  color: var(--color-slate-300) !important;
+}
+
+.alert-info .alert-heading {
+  color: var(--color-pure-white) !important;
+}
+
+/* List group styling for dark theme */
+.list-group-item {
+  background-color: var(--color-slate-800) !important;
+  border-color: var(--color-slate-700) !important;
+  color: var(--color-pure-white) !important;
+}
+
+.list-group-item:hover {
+  background-color: var(--color-slate-700) !important;
 }
 
 .btn-color-complete {

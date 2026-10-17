@@ -62,7 +62,7 @@ function WorkoutCharts({ refreshTrigger = 0 }: WorkoutChartsProps) {
   if (chartData.length === 0) {
     return (
       <div style={{ width: '100%', height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p className="text-muted">No workout data available. Start logging your workouts!</p>
+        <p className="text-slate-300">No workout data available. Start logging your workouts!</p>
       </div>
     )
   }
@@ -76,7 +76,7 @@ function WorkoutCharts({ refreshTrigger = 0 }: WorkoutChartsProps) {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="exercises" fill="#CEFE46" name="Exercises Done" />
+          <Bar dataKey="exercises" fill="#22C55E" name="Exercises Done" />
         </BarChart>
       </ResponsiveContainer>
     </div>

@@ -20,14 +20,14 @@ const DAILY_TARGETS = {
 function MacroDonutChart({ data, title, unit, colors }: { data: any[], title: string, unit: string, colors: string[] }) {
   return (
     <div style={{ textAlign: 'center' }}>
-      <h5 className="meals-chart-title">{title}</h5>
-      <div style={{ width: '100%', height: 150 }}>
+      <h5 className="meals-chart-title text-pure-white">{title}</h5>
+      <div style={{ width: '100%', height: 170 }}>
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={data}
               cx="50%"
-              cy="50%"
+              cy="55%"
               labelLine={false}
               label={({ value }) => `${value}${unit}`}
               outerRadius={50}
