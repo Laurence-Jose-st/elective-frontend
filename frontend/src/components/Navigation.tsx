@@ -77,12 +77,12 @@ function Navigation() {
         {!user ? (
           <>
             <li className="nav-item">
-              <NavLink to="/login" className="nav-link text-dark">
+              <NavLink to="/login" className="nav-link text-pure-white">
                 Login
               </NavLink>
             </li>
             <li className="nav-item">
-              <NavLink to="/signup" className="nav-link text-dark">
+              <NavLink to="/signup" className="nav-link text-pure-white">
                 Sign Up
               </NavLink>
             </li>
@@ -94,7 +94,7 @@ function Navigation() {
                 <Dropdown show={showNotifications} onToggle={(isOpen) => setShowNotifications(isOpen)}>
                   <Dropdown.Toggle
                     variant="link"
-                    className="nav-link text-dark position-relative p-0"
+                    className="nav-link text-pure-white position-relative p-0"
                     style={{ background: 'none', border: 'none', cursor: 'pointer' }}
                     title="Notifications"
                   >
@@ -138,11 +138,11 @@ function Navigation() {
             )}
             <li className="nav-item">
               <button
-                className="nav-link text-dark"
+                className="nav-link text-pure-white"
                 onClick={handleShow}
                 style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', height: '100%' }}
               >
-                <span style={{ fontFamily: 'bootstrap-icons', lineHeight: '1', color: 'black', fontSize: '2rem', position: 'relative', top: '-1px' }}>
+                <span style={{ fontFamily: 'bootstrap-icons', lineHeight: '1', color: 'white', fontSize: '2rem', position: 'relative', top: '-1px' }}>
                   {"\uF4D7"}
                 </span>
               </button>
@@ -151,19 +151,19 @@ function Navigation() {
         )}
       </ul>
 
-      <Offcanvas show={showDrawer} onHide={handleClose} placement="end">
-        <Offcanvas.Header closeButton>
-          <Offcanvas.Title>Profile</Offcanvas.Title>
+      <Offcanvas show={showDrawer} onHide={handleClose} placement="end" className="bg-charcoal">
+        <Offcanvas.Header closeButton closeVariant="white">
+          <Offcanvas.Title className="text-pure-white text-fonts">Profile</Offcanvas.Title>
         </Offcanvas.Header>
-        <Offcanvas.Body>
+        <Offcanvas.Body className="bg-charcoal">
           <div className="mb-4">
-            <h5>Welcome, {user?.username || 'User'}!</h5>
-            <p className="text-muted">{user?.email}</p>
+            <h5 className="text-pure-white text-fonts">Welcome, {user?.username || 'User'}!</h5>
+            <p className="text-off-white text-fonts">{user?.email}</p>
             <Badge bg={isAdmin ? 'danger' : 'success'} className="mb-2">
               {isAdmin ? 'ADMIN' : 'REGISTERED'}
             </Badge>
           </div>
-          <Button variant="danger" className="w-100" onClick={logout}>
+          <Button variant="danger" className="w-100 border-0 text-fonts" onClick={logout}>
             Logout
           </Button>
         </Offcanvas.Body>
