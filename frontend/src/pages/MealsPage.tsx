@@ -364,8 +364,8 @@ function MealsPage() {
                             <div className="card bg-charcoal border-0">
                                 <div className="card-body text-center py-5">
                                     <h3 className="mb-3 text-neon-yellow">{dailyTotals.calories} kcal</h3>
-                                    <p className="text-off-white">Total Calories Today</p>
-                                    <Alert variant="info" className="mt-3 bg-charcoal text-pure-white">
+                                    <p className="text-fonts text-pure-white">Total Calories Today</p>
+                                    <Alert variant="info" className="mt-2  border-0 bg-charcoal text-fonts text-pure-white">
                                         <small className="text-off-white">Detailed macro breakdown (Protein, Carbs, Fats, Fiber) is available for registered users only.</small>
                                     </Alert>
                                 </div>
@@ -383,9 +383,9 @@ function MealsPage() {
                 <div className="card bg-charcoal border-0">
                     <div className="card-body">
                         {!user && (
-                            <Alert variant="info" className="mb-3 bg-charcoal text-pure-white">
-                                <h6>Guest Mode</h6>
-                                <p className="mb-0">You can search for food items and view calorie information. To log meals and track detailed macros, please login or sign up.</p>
+                            <Alert variant="info" className="mb-3 border-0 bg-charcoal text-fonts text-pure-white">
+                                <h4>Guest Mode</h4>
+                                <p className="mb-0 text-off-white">You can search for food items and view calorie information. To log meals and track detailed macros, please login or sign up.</p>
                             </Alert>
                         )}
                         <div className="row mb-3">
@@ -408,7 +408,7 @@ function MealsPage() {
                         </div>
 
                         <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k as 'today' | 'history')} className="mb-3">
-                            <Tab eventKey="today" title="Today's Diary">
+                            <Tab eventKey="today" title="Today's Diary" tabClassName={activeTab === 'today' ? 'active-tab' : 'unselected-tab'}>
                                 <div className="row">
                                     {(() => {
                                         const today = new Date().toDateString()

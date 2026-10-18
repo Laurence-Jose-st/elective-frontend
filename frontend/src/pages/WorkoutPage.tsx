@@ -26,6 +26,7 @@ interface Exercise {
   body_part: string
   target: string
   equipment: string
+  gif_url?: string
 }
 
 interface WorkoutSet {
@@ -43,6 +44,7 @@ interface SessionExercise {
   bodyPart: string
   target: string
   equipment: string
+  gif_url?: string
   notes?: string
   isCustom?: boolean
   sets: WorkoutSet[]
@@ -62,6 +64,9 @@ function WorkoutPage() {
   const { user } = useAuth()
   const [activeTab, setActiveTab] = useState<'session' | 'history' | 'progression'>('session')
   const [showModal, setShowModal] = useState(false)
+  const [showMovementModal, setShowMovementModal] = useState(false)
+  const [movementGifUrl, setMovementGifUrl] = useState<string>('')
+  const [movementExerciseName, setMovementExerciseName] = useState<string>('')
   const [searchQuery, setSearchQuery] = useState('')
   const [searchResults, setSearchResults] = useState<Exercise[]>([])
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null)
@@ -292,6 +297,7 @@ function WorkoutPage() {
         bodyPart: se.exercises?.body_part || 'custom',
         target: se.exercises?.target || 'custom',
         equipment: se.exercises?.equipment || 'custom',
+        gif_url: se.exercises?.gif_url,
         notes: se.notes || '',
         isCustom: !se.exercise_id,
         sets: se.workout_sets?.map((set: any) => ({
@@ -359,6 +365,16 @@ function WorkoutPage() {
 
   const isExerciseInSession = (exercise: Exercise) => {
     return sessionExercises.some(e => e.exerciseId === exercise.id)
+  }
+
+  const handleSeeMovement = (exercise: SessionExercise) => {
+    if (exercise.gif_url) {
+      setMovementGifUrl(exercise.gif_url)
+      setMovementExerciseName(exercise.exerciseName)
+      setShowMovementModal(true)
+    } else {
+      alert('No movement demo available for this exercise.')
+    }
   }
 
   const handleAddExerciseToSession = () => {
@@ -444,6 +460,7 @@ function WorkoutPage() {
         bodyPart: exercise.body_part,
         target: exercise.target,
         equipment: exercise.equipment,
+        gif_url: exercise.gif_url,
         notes: '',
         sets: [
           {
@@ -544,21 +561,24 @@ function WorkoutPage() {
         <div className="row align-items-center">
           <div className="col-12">
             <div className="d-flex justify-content-end">
-              <ButtonGroup>
+              <ButtonGroup className="bg-charcoal">
                 <Button
                   variant={activeTab === 'session' ? 'primary' : 'outline-primary'}
+                  className={`btn-font border-0 btn-size ${activeTab !== 'session' ? 'btn-tab-inactive' : ''}`}
                   onClick={() => setActiveTab('session')}
                 >
                   Session
                 </Button>
                 <Button
                   variant={activeTab === 'history' ? 'primary' : 'outline-primary'}
+                   className={`btn-font border-0 btn-size ${activeTab !== 'history' ? 'btn-tab-inactive' : ''}`}
                   onClick={() => setActiveTab('history')}
                 >
                   History
                 </Button>
                 <Button
                   variant={activeTab === 'progression' ? 'primary' : 'outline-primary'}
+                   className={`btn-font border-0 btn-size ${activeTab !== 'progression' ? 'btn-tab-inactive' : ''}`}
                   onClick={() => setActiveTab('progression')}
                 >
                   Progression
@@ -576,14 +596,15 @@ function WorkoutPage() {
         <div className="container mt-4">
           <div className="row">
             <div className="col-12">
-              <div className="card bg-charcoal border-0" style={{ minHeight: '300px' }}>
+              <div className="card bg-charcoal border-0" style={{ minHeight: '200px' }}>
                 <div className="card-body d-flex flex-column">
                   {!user ? (
-                    <Alert variant="warning" className="text-center bg-charcoal text-pure-white">
-                      <h5 className="text-neon-yellow">Guest Mode</h5>
-                      <p className="mb-2 text-off-white">You can view workout history, but logging new workouts requires an account.</p>
+                    <Alert variant="warning" className="text-center border-0 bg-charcoal text-pure-white">
+                      <h5 className="text-pure-white">Guest Mode</h5>
+                      <p className="mb-2 text-fonts text-off-white">You can view workout history, but logging new workouts requires an account.</p>
                       <button
-                        className="btn btn-primary btn-sm"
+                        className="btn btn-font btn-primary"
+                        style={{ padding: '10px 20px', fontSize: '16px'}}
                         onClick={() => window.location.href = '/login'}
                       >
                         Login to Log Workouts
@@ -597,6 +618,7 @@ function WorkoutPage() {
                         <Form.Control
                           type="text"
                           list="sessionTitles"
+                          className="border-0 border-bottom bg-charcoal text-pure-white"
                           value={sessionTitle}
                           onChange={(e) => setSessionTitle(e.target.value)}
                           placeholder="Enter session title or select a preset..."
@@ -623,12 +645,14 @@ function WorkoutPage() {
                         <ButtonGroup className="mb-3 w-100">
                           <Button
                             variant={durationMode === 'timer' ? 'primary' : 'outline-primary'}
+                            className="border-0 text-fonts"
                             onClick={() => setDurationMode('timer')}
                           >
                             Timer
                           </Button>
                           <Button
                             variant={durationMode === 'manual' ? 'primary' : 'outline-primary'}
+                            className="border-0 text-fonts"
                             onClick={() => setDurationMode('manual')}
                           >
                             Manual
@@ -636,8 +660,8 @@ function WorkoutPage() {
                         </ButtonGroup>
 
                         {durationMode === 'timer' ? (
-                          <div className="text-center py-3 bg-light rounded">
-                            <h2 className="display-4 fw-bold mb-3">{formatTimer(timerSeconds)}</h2>
+                          <div className="text-center py-3 bg-charcoal rounded">
+                            <h2 className="display-4 fw-bold mb-3 text-pure-white">{formatTimer(timerSeconds)}</h2>
                             <div className="d-flex justify-content-center gap-2">
                               <Button variant="success" onClick={handleTimerStart} disabled={isTimerRunning}>
                                 Start
@@ -658,6 +682,7 @@ function WorkoutPage() {
                                   key={preset.value}
                                   variant={manualDuration === preset.value ? 'primary' : 'outline-primary'}
                                   size="sm"
+                                  className="border-0 btn-font text-off-white"
                                   onClick={() => setManualDuration(preset.value)}
                                 >
                                   {preset.label}
@@ -675,10 +700,10 @@ function WorkoutPage() {
                                 }}
                                 min="1"
                                 max="720"
-                                className={`flex-grow-1 ${validationErrors.manualDuration ? 'border-danger' : ''}`}
+                                className={`flex-grow-1 border-0 border-bottom ${validationErrors.manualDuration ? 'border-danger' : ''}`}
                               />
                               {validationErrors.manualDuration && (
-                                <small className="text-danger" style={{ fontSize: '0.7rem' }}>
+                                <small className="bg-charcoal text-white" style={{ fontSize: '0.7rem' }}>
                                   {validationErrors.manualDuration}
                                 </small>
                               )}
@@ -686,6 +711,7 @@ function WorkoutPage() {
                                 value={manualDurationUnit}
                                 onChange={(e) => setManualDurationUnit(e.target.value as any)}
                                 style={{ width: '100px' }}
+                                className="border-0 border-bottom"
                               >
                                 <option value="min">min</option>
                                 <option value="hrs">hrs</option>
@@ -697,15 +723,17 @@ function WorkoutPage() {
 
                       {/* Weight Unit Toggle */}
                       <div className="mb-3">
-                        <ButtonGroup size="sm">
+                        <ButtonGroup size="sm" className="btn-font">
                           <Button
                             variant={weightUnit === 'lbs' ? 'primary' : 'outline-primary'}
+                            className="border-0"
                             onClick={() => setWeightUnit('lbs')}
                           >
                             lbs
                           </Button>
                           <Button
                             variant={weightUnit === 'kg' ? 'primary' : 'outline-primary'}
+                            className="border-0"
                             onClick={() => setWeightUnit('kg')}
                           >
                             kg
@@ -715,45 +743,57 @@ function WorkoutPage() {
 
                       <div className="list-group">
                         <div
-                          className="list-group-item d-flex justify-content-between align-items-center"
+                          className="list-group-item d-flex justify-content-between align-items-center border-0 border-bottom bg-charcoal text-fonts"
                           onClick={() => setShowModal(true)}
-                          style={{ cursor: 'pointer' }}
+                          style={{ cursor: 'pointer', borderColor: '#CEFE46' }}
                         >
-                          <span className="text-primary">Add Exercise</span>
-                          <i className="bi bi-plus-lg text-primary"></i>
+                          <span className="text-pure-white">Add Exercise</span>
+                          <i className="bi bi-plus-lg text-pure-white"></i>
                         </div>
                         {sessionExercises.length > 0 && sessionExercises.map((exercise, exerciseIdx) => (
                           <div
                             key={exercise.exerciseId}
-                            className="list-group-item"
+                            className="list-group-item border-0 border-bottom bg-charcoal"
                           >
                             <div className="d-flex justify-content-between align-items-center mb-2">
-                              <div className="fw-bold">
+                              <div className="fw-bold text-pure-white text-fonts">
                                 {exercise.exerciseName}
                                 {exercise.isCustom && <Badge bg="secondary" className="ms-2">Custom</Badge>}
                               </div>
-                              <Button
-                                variant="outline-danger"
-                                size="sm"
-                                onClick={() => {
-                                  const updated = [...sessionExercises]
-                                  updated.splice(exerciseIdx, 1)
-                                  setSessionExercises(updated)
-                                }}
-                              >
-                                <i className="bi bi-trash"></i>
-                              </Button>
+                              <div className="d-flex gap-2">
+                                {!exercise.isCustom && exercise.gif_url && (
+                                  <Button
+                                    variant="outline-primary"
+                                    className="border-0 btn-font"
+                                    size="sm"
+                                    onClick={() => handleSeeMovement(exercise)}
+                                  >
+                                 See Movement
+                                  </Button>
+                                )}
+                                <Button
+                                  variant="outline-danger"
+                                  size="sm"
+                                  onClick={() => {
+                                    const updated = [...sessionExercises]
+                                    updated.splice(exerciseIdx, 1)
+                                    setSessionExercises(updated)
+                                  }}
+                                >
+                                  <i className="bi bi-trash"></i>
+                                </Button>
+                              </div>
                             </div>
-                            <small className="text-muted">
+                            <small className="text-off-white">
                               {exercise.bodyPart} • {exercise.equipment}
                             </small>
                             {exercise.notes && (
-                              <small className="text-muted d-block mt-1">Note: {exercise.notes}</small>
+                              <small className="text-off-white d-block mt-1">Note: {exercise.notes}</small>
                             )}
                             <div className="mt-2">
                               {exercise.sets.map((set, setIdx) => (
                                 <div key={set.id} className="d-flex gap-2 align-items-center mb-1">
-                                  <span className="text-muted small">Set {set.setNumber}:</span>
+                                  <span className="text-off-white small">Set {set.setNumber}:</span>
                                   <Form.Control
                                     type="number"
                                     size="sm"
@@ -769,10 +809,10 @@ function WorkoutPage() {
                                     min="0"
                                     max="2000"
                                     style={{ width: '80px' }}
-                                    className={validationErrors[`weight-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}
+                                    className={`border-0 border-bottom ${validationErrors[`weight-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}`}
                                   />
-                                  <span className="text-muted small">{weightUnit}</span>
-                                  <span className="text-muted small">x</span>
+                                  <span className="text-off-white small">{weightUnit}</span>
+                                  <span className="text-off-white small">x</span>
                                   <Form.Control
                                     type="number"
                                     size="sm"
@@ -788,7 +828,7 @@ function WorkoutPage() {
                                     min="1"
                                     max="100"
                                     style={{ width: '70px' }}
-                                    className={validationErrors[`reps-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}
+                                    className={`border-0 border-bottom ${validationErrors[`reps-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}`}
                                   />
                                   {validationErrors[`weight-${exerciseIdx}-${setIdx}`] && (
                                     <small className="text-danger" style={{ fontSize: '0.7rem' }}>
@@ -800,7 +840,7 @@ function WorkoutPage() {
                                       {validationErrors[`reps-${exerciseIdx}-${setIdx}`]}
                                     </small>
                                   )}
-                                  <span className="text-muted small">reps</span>
+                                  <span className="text-off-white small">reps</span>
                                   <Form.Check
                                     type="checkbox"
                                     label="Warmup"
@@ -823,6 +863,7 @@ function WorkoutPage() {
                               ))}
                               <Button
                                 variant="outline-primary"
+                                className="border-0 mt-2 d-flex align-items-center gap-1 text-fonts"
                                 size="sm"
                                 onClick={() => {
                                   const updated = [...sessionExercises]
@@ -839,7 +880,8 @@ function WorkoutPage() {
                                   setSessionExercises(updated)
                                 }}
                               >
-                                + Add Set
+                                <i className="bi bi-plus-lg fs-5" style={{ fontSize: '0.2rem' }}/> 
+                                Add Set
                               </Button>
                             </div>
                           </div>
@@ -848,13 +890,14 @@ function WorkoutPage() {
 
                       {/* Session Notes - Moved to Bottom */}
                       <div className="mt-3 pt-3 border-top">
-                        <label className="form-label fw-bold">Session Notes (Optional)</label>
+                        <label className="form-label fw-bold text-font text-off-white">Session Notes (Optional)</label>
                         <Form.Control
                           as="textarea"
                           rows={2}
                           placeholder="Add notes about this workout session..."
                           value={sessionNotes}
                           onChange={(e) => setSessionNotes(e.target.value)}
+                          className="border-0 border-bottom"
                         />
                       </div>
 
@@ -897,15 +940,15 @@ function WorkoutPage() {
           <div className="row">
             <div className="col-12">
               <div className="card bg-charcoal border-0">
-                <div className="card-body">
-                  <h5 className="mb-4 text-pure-white">Workout History</h5>
+                <div className="mt-3 card-body d-flex flex-column justify-content-center">
+                  <h5 className="text-pure-white text-center text-fonts">Workout History</h5>
                   {!user ? (
-                    <Alert variant="info" className="bg-charcoal text-pure-white">
-                      <p className="mb-0 text-off-white">Login to view your workout history.</p>
+                    <Alert variant="info" className="bg-charcoal border-0 text-pure-white text-center">
+                      <p className="mb-0 text-off-white text-fonts">Login to view your workout history.</p>
                     </Alert>
                   ) : completedSessions.length === 0 ? (
-                    <Alert variant="info">
-                      <p className="mb-0">No completed workout sessions yet.</p>
+                    <Alert variant="info" className="bg-charcoal border-0 text-pure-white text-center">
+                      <p className="mb-0 text-fonts">No completed workout sessions yet.</p>
                     </Alert>
                   ) : (
                     (() => {
@@ -925,58 +968,78 @@ function WorkoutPage() {
                       return (
                         <Accordion className="col-12" defaultActiveKey={sortedDates[0]}>
                           {sortedDates.map((date) => (
-                            <Accordion.Item eventKey={date} key={date}>
-                              <Accordion.Header>
+                            <Accordion.Item eventKey={date} key={date} className="bg-charcoal border-0">
+                              <Accordion.Header className="text-fonts" style={{ backgroundColor: '#1a1a1a' }}>
+                                <style>{`
+                                  .accordion-button:not(.collapsed) {
+                                    background-color: #1a1a1a !important;
+                                    color: white !important;
+                                  }
+                                  .accordion-button {
+                                    background-color: #1a1a1a !important;
+                                    color: white !important;
+                                  }
+                                `}</style>
                                 <div className="d-flex justify-content-between align-items-center w-100">
                                   <span>
-                                    <strong>
+                                    <strong className="text-pure-white text-fonts">
                                       {new Date(date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
                                     </strong>
                                     {date === new Date().toDateString() && (
                                       <span className="badge bg-primary ms-2">Today</span>
                                     )}
-                                    <span className="text-muted ms-3 small">
+                                    <span className="text-off-white ms-3 small text-fonts">
                                       {sessionsByDate[date].length} session{sessionsByDate[date].length !== 1 ? 's' : ''}
                                     </span>
                                   </span>
                                 </div>
                               </Accordion.Header>
-                              <Accordion.Body>
+                              <Accordion.Body className="bg-charcoal">
                                 <Accordion flush>
                                   {sessionsByDate[date].map((session: any, idx: number) => (
-                                    <Accordion.Item eventKey={`${date}-${idx}`} key={session.id}>
-                                      <Accordion.Header className="bg-light border">
+                                    <Accordion.Item eventKey={`${date}-${idx}`} key={session.id} className="bg-charcoal border-0">
+                                      <Accordion.Header className="border text-fonts" style={{ backgroundColor: '#1a1a1a' }}>
+                                        <style>{`
+                                          .accordion-button:not(.collapsed) {
+                                            background-color: #1a1a1a !important;
+                                            color: white !important;
+                                          }
+                                          .accordion-button {
+                                            background-color: #1a1a1a !important;
+                                            color: white !important;
+                                          }
+                                        `}</style>
                                         <div className="d-flex justify-content-between align-items-center w-100 me-3">
                                           <div>
-                                            <strong>{session.name}</strong>
-                                            <small className="text-muted ms-3">
+                                            <strong className="text-pure-white text-fonts">{session.name}</strong>
+                                            <small className="text-off-white ms-3 text-fonts">
                                               {new Date(session.start_time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                                             </small>
                                           </div>
                                           <Badge bg="primary">{formatDuration(session.duration_seconds)}</Badge>
                                         </div>
                                       </Accordion.Header>
-                                      <Accordion.Body>
+                                      <Accordion.Body className="bg-charcoal">
                                         {(() => {
                                           const parsedNotes = parseSessionNotes(session.notes)
                                           return parsedNotes && (
-                                            <div className="mb-3 p-2 bg-light rounded">
-                                              <small className="text-muted">Notes: {parsedNotes}</small>
+                                            <div className="mb-3 p-2 bg-charcoal rounded">
+                                              <small className="text-off-white text-fonts">Notes: {parsedNotes}</small>
                                             </div>
                                           )
                                         })()}
                                         {session.session_exercises && session.session_exercises.length > 0 && (
                                           <div className="list-group">
                                             {session.session_exercises.map((se: any) => (
-                                              <div key={se.id} className="list-group-item">
-                                                <div className="fw-bold">{se.exercises?.name || 'Exercise'}</div>
-                                                <small className="text-muted">
+                                              <div key={se.id} className="list-group-item bg-charcoal">
+                                                <div className="fw-bold text-pure-white text-fonts">{se.exercises?.name || 'Exercise'}</div>
+                                                <small className="text-off-white text-fonts">
                                                   {se.body_part} • {se.equipment}
                                                 </small>
                                                 {se.workout_sets && se.workout_sets.length > 0 && (
                                                   <div className="mt-2">
                                                     {se.workout_sets.map((set: any) => (
-                                                      <div key={set.id} className="small text-muted">
+                                                      <div key={set.id} className="small text-off-white text-fonts">
                                                         Set {set.setNumber}: {set.weight} {se.weight_unit || 'lbs'} × {set.reps} reps
                                                         {set.is_warmup && <Badge bg="warning" className="ms-2">Warmup</Badge>}
                                                       </div>
@@ -991,6 +1054,7 @@ function WorkoutPage() {
                                           <Button
                                             variant="outline-primary"
                                             size="sm"
+                                            className="border-0 text-fonts"
                                             onClick={() => handleCopySession(session)}
                                           >
                                             <i className="bi bi-plus-circle"></i> Copy to Today
@@ -1019,23 +1083,24 @@ function WorkoutPage() {
         <div className="container mt-4">
           <div className="row">
             <div className="col-12">
-              <div className="card border-0">
-                <div className="card-body">
-                  <h5 className="mb-4">Progressive Overload</h5>
+              <div className="card border-0 bg-charcoal">
+                <div className="card-body bg-charcoal border-0 d-flex flex-column justify-content-center">
+                  <h5 className="mt-3 text-pure-white text-center text-fonts">Progressive Overload</h5>
                   {!user ? (
-                    <Alert variant="info">
-                      <p className="mb-0">Login to view your progressive overload data.</p>
+                    <Alert variant="info" className="bg-charcoal border-0 text-off-white text-center">
+                      <p className="mb-0 text-fonts">Login to view your progressive overload data.</p>
                     </Alert>
                   ) : (
                     <>
                       <div className="mb-4">
-                        <label className="form-label fw-bold">Select Exercise</label>
+                        <label className="form-label fw-bold text-pure-white text-fonts">Select Exercise</label>
                         <Form.Select
                           value={selectedExerciseForProgression}
                           onChange={(e) => {
                             setSelectedExerciseForProgression(e.target.value)
                             fetchProgressiveOverload(e.target.value === 'all' ? undefined : e.target.value)
                           }}
+                          className="border-0 border-bottom bg-charcoal text-pure-white text-fonts"
                         >
                           <option value="all">All Exercises</option>
                           {Object.keys(previousWorkout || {}).map(exerciseName => (
@@ -1047,20 +1112,20 @@ function WorkoutPage() {
                       {/* Suggested Challenge Card */}
                       {selectedExerciseForProgression !== 'all' && previousWorkout && previousWorkout[selectedExerciseForProgression] && (
                         <div className="mb-4 p-3 bg-success bg-opacity-10 border border-success rounded">
-                          <h6 className="fw-bold text-success">🎯 Suggested Challenge</h6>
-                          <div className="mb-2 text-muted small">Exercise: {selectedExerciseForProgression}</div>
+                          <h6 className="fw-bold text-success text-fonts">🎯 Suggested Challenge</h6>
+                          <div className="mb-2 text-off-white small text-fonts">Exercise: {selectedExerciseForProgression}</div>
                           {(() => {
                             const challenge = calculateSuggestedChallenge(selectedExerciseForProgression)
                             if (!challenge) return null
                             return (
                               <div>
-                                <p className="mb-2">
+                                <p className="mb-2 text-fonts">
                                   <strong>Last Session:</strong> {challenge.lastWeight} {weightUnit} × {challenge.lastReps} reps
                                 </p>
-                                <p className="mb-2">
+                                <p className="mb-2 text-fonts">
                                   <strong>Target for Today:</strong> {challenge.suggestedWeight} {weightUnit} × {challenge.suggestedReps} reps
                                 </p>
-                                <p className="mb-0 text-muted small">
+                                <p className="mb-0 text-off-white small text-fonts">
                                   💡 {challenge.recommendation}
                                 </p>
                               </div>
@@ -1072,23 +1137,23 @@ function WorkoutPage() {
                       {progressiveOverloadData ? (
                         <div>
                           {progressiveOverloadData.currentPR && (
-                            <div className="mb-4 p-3 bg-light rounded">
-                              <h6 className="fw-bold">Current Personal Record</h6>
+                            <div className="mb-4 p-3 bg-charcoal rounded">
+                              <h6 className="fw-bold text-pure-white text-fonts">Current Personal Record</h6>
                               {progressiveOverloadData.currentPR.exerciseName && (
-                                <p className="mb-2 text-muted small">Exercise: {progressiveOverloadData.currentPR.exerciseName}</p>
+                                <p className="mb-2 text-off-white small text-fonts">Exercise: {progressiveOverloadData.currentPR.exerciseName}</p>
                               )}
                               <div className="d-flex gap-4">
                                 <div>
-                                  <small className="text-muted">Weight</small>
-                                  <div className="fw-bold">{progressiveOverloadData.currentPR.weight} lbs</div>
+                                  <small className="text-off-white text-fonts">Weight</small>
+                                  <div className="fw-bold text-pure-white">{progressiveOverloadData.currentPR.weight} lbs</div>
                                 </div>
                                 <div>
-                                  <small className="text-muted">Reps</small>
-                                  <div className="fw-bold">{progressiveOverloadData.currentPR.reps}</div>
+                                  <small className="text-off-white text-fonts">Reps</small>
+                                  <div className="fw-bold text-pure-white">{progressiveOverloadData.currentPR.reps}</div>
                                 </div>
                                 <div>
-                                  <small className="text-muted">Volume</small>
-                                  <div className="fw-bold">{progressiveOverloadData.currentPR.volume} lbs</div>
+                                  <small className="text-off-white text-fonts">Volume</small>
+                                  <div className="fw-bold text-pure-white">{progressiveOverloadData.currentPR.volume} lbs</div>
                                 </div>
                               </div>
                             </div>
@@ -1096,13 +1161,13 @@ function WorkoutPage() {
 
                           {progressiveOverloadData.metrics && progressiveOverloadData.metrics.length > 0 && (
                             <div className="mb-4">
-                              <h6 className="fw-bold mb-3">Recent Sessions</h6>
+                              <h6 className="fw-bold mb-3 text-pure-white text-fonts">Recent Sessions</h6>
                               <div className="list-group">
                                 {progressiveOverloadData.metrics.map((metric: any, idx: number) => (
-                                  <div key={idx} className="list-group-item d-flex justify-content-between align-items-center">
+                                  <div key={idx} className="list-group-item d-flex justify-content-between align-items-center bg-charcoal">
                                     <div>
-                                      <div className="fw-bold">{formatDate(metric.date)}</div>
-                                      <small className="text-muted">
+                                      <div className="fw-bold text-pure-white text-fonts">{formatDate(metric.date)}</div>
+                                      <small className="text-off-white text-fonts">
                                         {metric.exerciseName ? `${metric.exerciseName}: ` : ''}
                                         {metric.weight} lbs × {metric.reps} reps × {metric.sets} sets
                                       </small>
@@ -1116,31 +1181,31 @@ function WorkoutPage() {
 
                           {progressiveOverloadData.improvements && progressiveOverloadData.improvements.length > 0 && (
                             <div>
-                              <h6 className="fw-bold mb-3">Progress</h6>
+                              <h6 className="fw-bold mb-3 text-pure-white text-fonts">Progress</h6>
                               <div className="list-group">
                                 {progressiveOverloadData.improvements.map((improvement: any, idx: number) => (
-                                  <div key={idx} className="list-group-item">
-                                    <div className="fw-bold">
+                                  <div key={idx} className="list-group-item bg-charcoal">
+                                    <div className="fw-bold text-pure-white text-fonts">
                                       {formatDate(improvement.date)}
                                       {improvement.exerciseName && (
-                                        <span className="text-muted ms-2">- {improvement.exerciseName}</span>
+                                        <span className="text-off-white ms-2 text-fonts">- {improvement.exerciseName}</span>
                                       )}
                                     </div>
                                     <div className="d-flex gap-3 mt-2">
                                       <div>
-                                        <small className="text-muted">Weight Change</small>
+                                        <small className="text-off-white text-fonts">Weight Change</small>
                                         <div className={improvement.weightChange >= 0 ? 'text-success' : 'text-danger'}>
                                           {improvement.weightChange >= 0 ? '+' : ''}{improvement.weightChange} lbs
                                         </div>
                                       </div>
                                       <div>
-                                        <small className="text-muted">Volume Change</small>
+                                        <small className="text-off-white text-fonts">Volume Change</small>
                                         <div className={improvement.volumeChange >= 0 ? 'text-success' : 'text-danger'}>
                                           {improvement.volumeChange >= 0 ? '+' : ''}{improvement.volumeChange} lbs
                                         </div>
                                       </div>
                                       <div>
-                                        <small className="text-muted">Reps Change</small>
+                                        <small className="text-off-white text-fonts">Reps Change</small>
                                         <div className={improvement.repsChange >= 0 ? 'text-success' : 'text-danger'}>
                                           {improvement.repsChange >= 0 ? '+' : ''}{improvement.repsChange}
                                         </div>
@@ -1153,8 +1218,8 @@ function WorkoutPage() {
                           )}
                         </div>
                       ) : (
-                        <Alert variant="info">
-                          <p className="mb-0">No progressive overload data available. Complete some workouts first!</p>
+                        <Alert variant="info" className="bg-charcoal border-0">
+                          <p className="mb-0 text-fonts">No progressive overload data available. Complete some workouts first!</p>
                         </Alert>
                       )}
                     </>
@@ -1172,18 +1237,19 @@ function WorkoutPage() {
         setSelectedExercise(null)
         setSearchQuery('')
         setSearchResults([])
-      }}>
+      }}
+      contentClassName="bg-charcoal rounded-4">
         <Modal.Header className="border-0 mt-2 ms-3" closeButton>
-          <Modal.Title>Add Exercise to Session</Modal.Title>
+          <Modal.Title className="text-pure-white text-fonts">Add Exercise to Session</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <div className="card mb-2 border-0">
-            <div className="card-body">
+          <div className="card bg-charcoal mb-2 border-0">
+            <div className="card-body ">
               <div className="mb-3 position-relative">
-                <label htmlFor="exerciseName" className="form-label">Exercise Name</label>
+                <label htmlFor="exerciseName" className="form-label text-fonts text-pure-white">Exercise Name</label>
                 <input
                   type="text"
-                  className="form-control border-0 border-bottom"
+                  className="form-control border-0 border-bottom bg-charcoal text-pure-white text-fonts"
                   id="exerciseName"
                   name="exerciseName"
                   placeholder="Search exercises or type custom name..."
@@ -1192,11 +1258,11 @@ function WorkoutPage() {
                   autoComplete="off"
                 />
                 {searchResults.length > 0 && (
-                  <div className="position-absolute w-100 bg-white border rounded shadow-lg mt-1" style={{ zIndex: 1000, maxHeight: '300px', overflowY: 'auto' }}>
+                  <div className="position-absolute w-100 bg-charcoal border rounded shadow-lg mt-1" style={{ zIndex: 1000, maxHeight: '300px', overflowY: 'auto' }}>
                     {searchResults.map((exercise) => (
                       <div
                         key={exercise.id}
-                        className="p-2 text-fonts search-result-item d-flex align-items-center"
+                        className="p-2 text-fonts search-result-item d-flex align-items-center text-pure-white"
                         style={{ cursor: 'pointer' }}
                       >
                         <Form.Check
@@ -1207,8 +1273,8 @@ function WorkoutPage() {
                           onClick={(e) => e.stopPropagation()}
                         />
                         <div className="flex-grow-1" onClick={() => handleExerciseSelect(exercise)}>
-                          <div className="fw-bold">{exercise.name}</div>
-                          <small className="text-muted">
+                          <div className="fw-bold text-pure-white">{exercise.name}</div>
+                          <small className="text-off-white text-fonts">
                             {exercise.body_part} • {exercise.target} • {exercise.equipment}
                           </small>
                           {isExerciseInSession(exercise) && (
@@ -1220,14 +1286,14 @@ function WorkoutPage() {
                   </div>
                 )}
                 {isSearching && (
-                  <div className="position-absolute w-100 bg-white border rounded shadow-lg mt-1 p-2 text-muted" style={{ zIndex: 1000 }}>
+                  <div className="position-absolute w-100 bg-charcoal border rounded shadow-lg mt-1 p-2 text-off-white text-fonts" style={{ zIndex: 1000 }}>
                     Searching...
                   </div>
                 )}
               </div>
               {selectedExercises.length > 0 && (
-                <div className="mb-3 p-2 bg-light rounded">
-                  <small className="text-fonts text-muted">
+                <div className="mb-3 p-2 bg-charcoal rounded">
+                  <small className="text-fonts text-off-white">
                     <strong>Selected:</strong> {selectedExercises.length} exercise(s)
                   </small>
                   <div className="mt-1">
@@ -1238,15 +1304,15 @@ function WorkoutPage() {
                 </div>
               )}
               {selectedExercise && selectedExercises.length === 0 && (
-                <div className="mb-3 p-2 bg-light rounded">
-                  <small className="text-fonts text-muted">
+                <div className="mb-3 p-2 bg-charcoal rounded">
+                  <small className="text-fonts text-off-white">
                     <strong>Selected:</strong> {selectedExercise.name} ({selectedExercise.body_part} - {selectedExercise.equipment})
                   </small>
                 </div>
               )}
               {!selectedExercise && searchQuery && (
                 <div className="mb-3 p-2 bg-warning bg-opacity-10 border border-warning rounded">
-                  <small className="text-muted">
+                  <small className="text-off-white text-fonts">
                     <strong>Tip:</strong> Type a custom exercise name if not found in the database
                   </small>
                 </div>
@@ -1256,13 +1322,32 @@ function WorkoutPage() {
           <div className="text-center">
             <button
               type="button"
-              className="btn btn-font btn-primary mt-3 mb-2"
+              className="btn btn-font btn-primary mt-3 mb-2 border-0"
               style={{ padding: '10px 20px', fontSize: '16px' }}
               onClick={handleAddExerciseToSession}
             >
               Add Exercise
             </button>
           </div>
+        </Modal.Body>
+      </Modal>
+
+      {/* Movement Demo Modal */}
+      <Modal show={showMovementModal} size="lg" centered onHide={() => setShowMovementModal(false)}
+      contentClassName="bg-charcoal rounded-4">
+        <Modal.Header className="border-0 mt-2 ms-3" closeButton>
+          <Modal.Title className="text-pure-white text-fonts">{movementExerciseName} - Movement Demo</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="text-center">
+          {movementGifUrl ? (
+            <img
+              src={movementGifUrl}
+              alt={`${movementExerciseName} movement demo`}
+              style={{ maxWidth: '100%', maxHeight: '400px', borderRadius: '8px' }}
+            />
+          ) : (
+            <Alert variant="warning">No movement demo available for this exercise.</Alert>
+          )}
         </Modal.Body>
       </Modal>
     </>
