@@ -809,7 +809,7 @@ function WorkoutPage() {
                                     min="0"
                                     max="2000"
                                     style={{ width: '80px' }}
-                                    className={`border-0 border-bottom ${validationErrors[`weight-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}`}
+                                    className={`border-0 border-bottom bg-charcoal text-pure-white text-fonts ${validationErrors[`weight-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}`}
                                   />
                                   <span className="text-off-white small">{weightUnit}</span>
                                   <span className="text-off-white small">x</span>
@@ -828,7 +828,7 @@ function WorkoutPage() {
                                     min="1"
                                     max="100"
                                     style={{ width: '70px' }}
-                                    className={`border-0 border-bottom ${validationErrors[`reps-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}`}
+                                    className={`border-0 border-bottom bg-charcoal text-pure-white text-fonts ${validationErrors[`reps-${exerciseIdx}-${setIdx}`] ? 'border-danger' : ''}`}
                                   />
                                   {validationErrors[`weight-${exerciseIdx}-${setIdx}`] && (
                                     <small className="text-danger" style={{ fontSize: '0.7rem' }}>
@@ -843,7 +843,7 @@ function WorkoutPage() {
                                   <span className="text-off-white small">reps</span>
                                   <Form.Check
                                     type="checkbox"
-                                    label="Warmup"
+                                    label={<span className="text-off-white text-fonts">Warmup</span>}
                                     checked={set.isWarmup}
                                     onChange={(e) => {
                                       const updated = [...sessionExercises]
@@ -854,7 +854,7 @@ function WorkoutPage() {
                                   />
                                   <Form.Check
                                     type="checkbox"
-                                    label="Done"
+                                    label={<span className="text-off-white text-fonts">Done</span>}
                                     checked={set.completed}
                                     onChange={() => toggleSetComplete(exerciseIdx, setIdx)}
                                     className="ms-2"
@@ -1112,21 +1112,21 @@ function WorkoutPage() {
                       {/* Suggested Challenge Card */}
                       {selectedExerciseForProgression !== 'all' && previousWorkout && previousWorkout[selectedExerciseForProgression] && (
                         <div className="mb-4 p-3 bg-success bg-opacity-10 border border-success rounded">
-                          <h6 className="fw-bold text-success text-fonts">🎯 Suggested Challenge</h6>
-                          <div className="mb-2 text-off-white small text-fonts">Exercise: {selectedExerciseForProgression}</div>
+                          <h6 className="fw-bold text-pure-white text-fonts">Suggested Challenge</h6>
+                          <div className="mb-2 text-pure-white small text-fonts">Exercise: {selectedExerciseForProgression}</div>
                           {(() => {
                             const challenge = calculateSuggestedChallenge(selectedExerciseForProgression)
                             if (!challenge) return null
                             return (
                               <div>
-                                <p className="mb-2 text-fonts">
+                                <p className="mb-2 text-fonts text-pure-white">
                                   <strong>Last Session:</strong> {challenge.lastWeight} {weightUnit} × {challenge.lastReps} reps
                                 </p>
-                                <p className="mb-2 text-fonts">
+                                <p className="mb-2 text-fonts text-success">
                                   <strong>Target for Today:</strong> {challenge.suggestedWeight} {weightUnit} × {challenge.suggestedReps} reps
                                 </p>
                                 <p className="mb-0 text-off-white small text-fonts">
-                                  💡 {challenge.recommendation}
+                                  {challenge.recommendation}
                                 </p>
                               </div>
                             )
@@ -1164,7 +1164,7 @@ function WorkoutPage() {
                               <h6 className="fw-bold mb-3 text-pure-white text-fonts">Recent Sessions</h6>
                               <div className="list-group">
                                 {progressiveOverloadData.metrics.map((metric: any, idx: number) => (
-                                  <div key={idx} className="list-group-item d-flex justify-content-between align-items-center bg-charcoal">
+                                  <div key={idx} className="list-group-item d-flex justify-content-between align-items-center bg-charcoal" style={{ borderColor: 'rgba(255, 255, 255, 0.3)' }}>
                                     <div>
                                       <div className="fw-bold text-pure-white text-fonts">{formatDate(metric.date)}</div>
                                       <small className="text-off-white text-fonts">
@@ -1184,7 +1184,7 @@ function WorkoutPage() {
                               <h6 className="fw-bold mb-3 text-pure-white text-fonts">Progress</h6>
                               <div className="list-group">
                                 {progressiveOverloadData.improvements.map((improvement: any, idx: number) => (
-                                  <div key={idx} className="list-group-item bg-charcoal">
+                                  <div key={idx} className="list-group-item bg-charcoal" style={{ borderColor: 'rgba(255, 255, 255, 0.3)' }}>
                                     <div className="fw-bold text-pure-white text-fonts">
                                       {formatDate(improvement.date)}
                                       {improvement.exerciseName && (
@@ -1239,7 +1239,7 @@ function WorkoutPage() {
         setSearchResults([])
       }}
       contentClassName="bg-charcoal rounded-4">
-        <Modal.Header className="border-0 mt-2 ms-3" closeButton>
+        <Modal.Header className="border-0 mt-2 ms-3" closeButton closeVariant="white">
           <Modal.Title className="text-pure-white text-fonts">Add Exercise to Session</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -1335,7 +1335,7 @@ function WorkoutPage() {
       {/* Movement Demo Modal */}
       <Modal show={showMovementModal} size="lg" centered onHide={() => setShowMovementModal(false)}
       contentClassName="bg-charcoal rounded-4">
-        <Modal.Header className="border-0 mt-2 ms-3" closeButton>
+        <Modal.Header className="border-0 mt-2 ms-3" closeButton closeVariant="white">
           <Modal.Title className="text-pure-white text-fonts">{movementExerciseName} - Movement Demo</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-center">
