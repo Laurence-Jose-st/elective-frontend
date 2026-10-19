@@ -447,6 +447,21 @@ export const adminService = {
     return data;
   },
 
+  getBroadcastHistory: async () => {
+    const response = await fetch(`${API_BASE}/admin/broadcasts`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch broadcast history');
+    }
+
+    return data;
+  },
+
   addFoodItem: async (foodData: { name: string; category?: string; calories: number; protein?: number; carbs?: number; fats?: number; fiber?: number }) => {
     const response = await fetch(`${API_BASE}/admin/food`, {
       method: 'POST',
@@ -463,6 +478,36 @@ export const adminService = {
     return data;
   },
 
+  getFoodItems: async () => {
+    const response = await fetch(`${API_BASE}/admin/food`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch food items');
+    }
+
+    return data;
+  },
+
+  deleteFoodItem: async (id: number) => {
+    const response = await fetch(`${API_BASE}/admin/food/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to delete food item');
+    }
+
+    return data;
+  },
+
   addExercise: async (exerciseData: { name: string; body_part: string; target: string; equipment: string; gif_url?: string }) => {
     const response = await fetch(`${API_BASE}/admin/exercises`, {
       method: 'POST',
@@ -474,6 +519,36 @@ export const adminService = {
 
     if (!response.ok) {
       throw new Error(data.error || 'Failed to add exercise');
+    }
+
+    return data;
+  },
+
+  getExercises: async () => {
+    const response = await fetch(`${API_BASE}/admin/exercises`, {
+      method: 'GET',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch exercises');
+    }
+
+    return data;
+  },
+
+  deleteExercise: async (id: string) => {
+    const response = await fetch(`${API_BASE}/admin/exercises/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to delete exercise');
     }
 
     return data;

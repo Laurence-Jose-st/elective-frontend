@@ -144,3 +144,15 @@ model notifications {
 
   @@index([user_id, read], map: "idx_notifications_user_read")
 }
+
+model broadcasts {
+  id             Int      @id @default(autoincrement())
+  title          String   @db.VarChar(255)
+  message        String   @db.Text
+  target_type    String   @db.VarChar(50)
+  target_user_id Int?
+  sent_by        Int
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([created_at(sort: Desc)], map: "idx_broadcasts_created")
+}

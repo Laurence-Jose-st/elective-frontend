@@ -15,9 +15,14 @@ router.delete('/users/:id', adminController.deleteUser);
 
 // Broadcast Messaging
 router.post('/broadcast', adminController.sendBroadcast);
+router.get('/broadcasts', adminController.getBroadcastHistory);
 
 // Database Management
+router.get('/food', adminController.getFoodItems);
 router.post('/food', adminController.addFoodItem);
+router.delete('/food/:id', adminController.deleteFoodItem);
+router.get('/exercises', adminController.getExercises);
 router.post('/exercises', adminController.addExercise);
+router.delete('/exercises/:id', adminController.deleteExercise);
 
 export default router;

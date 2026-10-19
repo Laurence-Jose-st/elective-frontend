@@ -98,6 +98,117 @@ body {
   font-weight: bold;
 }
 
+/* Modal dark theme */
+.modal-content {
+  background-color: var(--color-charcoal) !important;
+  border: none !important;
+  border-radius: 1rem !important;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+.modal-header {
+  background-color: var(--color-charcoal) !important;
+  border-bottom: none !important;
+  border-radius: 1rem 1rem 0 0 !important;
+  padding: 1.5rem !important;
+}
+
+.modal-title {
+  color: var(--color-pure-white) !important;
+}
+
+.modal-body {
+  background-color: var(--color-charcoal) !important;
+  color: var(--color-pure-white) !important;
+  padding: 1.5rem !important;
+}
+
+.modal-footer {
+  background-color: var(--color-charcoal) !important;
+  border-top: none !important;
+  border-radius: 0 0 1rem 1rem !important;
+  padding: 1.5rem !important;
+}
+
+.modal .form-label {
+  color: var(--color-pure-white) !important;
+}
+
+.modal .form-control,
+.modal .form-select {
+  background-color: var(--color-off-black) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--color-neon-yellow) !important;
+  border-radius: 0.5rem !important;
+  color: var(--color-pure-white) !important;
+}
+
+.modal .form-control:focus,
+.modal .form-select:focus {
+  background-color: var(--color-off-black) !important;
+  border-bottom: 1px solid var(--color-neon-yellow) !important;
+  color: var(--color-pure-white) !important;
+  box-shadow: 0 0 0 0.25rem rgba(206, 254, 70, 0.25) !important;
+}
+
+.modal .form-control::placeholder {
+  color: var(--color-off-white) !important;
+}
+
+.modal .form-select option {
+  background-color: var(--color-off-black) !important;
+  color: var(--color-pure-white) !important;
+}
+
+.btn-close {
+  filter: invert(1) !important;
+}
+
+/* Table dark theme */
+.table {
+  color: var(--color-off-black) !important;
+}
+
+.table thead th {
+  color: var(--color-off-black) !important;
+  border-bottom: 1px solid var(--color-off-black) !important;
+  font-family: "Finlandica Text", sans-serif !important;
+  font-optical-sizing: auto !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+}
+
+.table tbody tr {
+  color: var(--color-off-black) !important;
+  background-color: var(--color-off-white) !important;
+  font-family: "Finlandica Text", sans-serif !important;
+  font-optical-sizing: auto !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+}
+
+.table tbody tr td {
+  background-color: var(--color-off-white) !important;
+  font-family: "Finlandica Text", sans-serif !important;
+  font-optical-sizing: auto !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > td {
+  background-color: var(--color-off-white) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  color: var(--color-off-black) !important;
+  background-color: var(--color-off-white) !important;
+}
+
+.table-hover > tbody > tr:hover > * {
+  color: var(--color-off-black) !important;
+  background-color: var(--color-pure-white) !important;
+}
+
 /* Buttons dark theme */
 .btn-primary {
   background-color: var(--color-neon-yellow) !important;

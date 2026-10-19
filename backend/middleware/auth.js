@@ -109,7 +109,7 @@ export function verifyAdmin(req, res, next) {
     return;
   }
 
-  if (req.user.role !== 'ADMIN') {
+  if (req.user.role?.toUpperCase() !== 'ADMIN') {
     res.status(403).json({
       success: false,
       error: 'Forbidden: Admin privilege required to perform this action.',
@@ -138,7 +138,7 @@ export function verifyRole(allowedRoles) {
       return;
     }
 
-    if (!allowedRoles.includes(req.user.role)) {
+    if (!allowedRoles.map(r => r.toUpperCase()).includes(req.user.role?.toUpperCase())) {
       res.status(403).json({
         success: false,
         error: `Forbidden: User role '${req.user.role}' is not authorized. Required: [${allowedRoles.join(', ')}]`,

@@ -1,22 +1,28 @@
 import { useState, useEffect } from 'react'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import { Tabs, Tab, Button, Badge, Table, Modal, Form, Alert } from 'react-bootstrap'
+import { Tabs, Tab, Button, Badge, Table, Modal, Form, Alert, Offcanvas } from 'react-bootstrap'
 import { useAuth } from '../contexts/AuthContext'
 import { adminService } from '../services/api'
-import Navigation from '../components/Navigation'
 import '../App.css'
 
 function AdminPage() {
-  const { user } = useAuth()
+  const { user, logout } = useAuth()
   const [activeTab, setActiveTab] = useState<'users' | 'broadcast' | 'database'>('users')
   const [users, setUsers] = useState<any[]>([])
   const [notifications, setNotifications] = useState<any[]>([])
+  const [broadcasts, setBroadcasts] = useState<any[]>([])
+  const [foodItems, setFoodItems] = useState<any[]>([])
+  const [exercises, setExercises] = useState<any[]>([])
   const [showBroadcastModal, setShowBroadcastModal] = useState(false)
   const [broadcastMessage, setBroadcastMessage] = useState('')
   const [broadcastTitle, setBroadcastTitle] = useState('')
   const [broadcastTargetType, setBroadcastTargetType] = useState<'all' | 'specific'>('all')
   const [targetUserId, setTargetUserId] = useState<number | null>(null)
-  
+  const [showDrawer, setShowDrawer] = useState(false)
+
+  const handleClose = () => setShowDrawer(false)
+  const handleShow = () => setShowDrawer(true)
+
   // Food Item Modal
   const [showFoodModal, setShowFoodModal] = useState(false)
   const [foodForm, setFoodForm] = useState({
@@ -42,7 +48,7 @@ function AdminPage() {
   useEffect(() => {
     console.log('AdminPage - User role check:', user?.role)
     console.log('AdminPage - User role (uppercase):', user?.role?.toUpperCase())
-    
+
     if (!user || user.role?.toUpperCase() !== 'ADMIN') {
       console.log('Access denied - redirecting to dashboard')
       window.location.href = '/dashboard'
@@ -50,6 +56,9 @@ function AdminPage() {
     }
     fetchUsers()
     fetchNotifications()
+    fetchBroadcastHistory()
+    fetchFoodItems()
+    fetchExercises()
   }, [user])
 
   const fetchUsers = async () => {
@@ -70,6 +79,63 @@ function AdminPage() {
       setNotifications([])
     } catch (error) {
       console.error('Error fetching notifications:', error)
+    }
+  }
+
+  const fetchBroadcastHistory = async () => {
+    try {
+      const response = await adminService.getBroadcastHistory()
+      setBroadcasts(response.data || [])
+    } catch (error) {
+      console.error('Error fetching broadcast history:', error)
+    }
+  }
+
+  const fetchFoodItems = async () => {
+    try {
+      const response = await adminService.getFoodItems()
+      setFoodItems(response.data || [])
+    } catch (error) {
+      console.error('Error fetching food items:', error)
+    }
+  }
+
+  const fetchExercises = async () => {
+    try {
+      const response = await adminService.getExercises()
+      setExercises(response.data || [])
+    } catch (error) {
+      console.error('Error fetching exercises:', error)
+    }
+  }
+
+  const handleDeleteFoodItem = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this food item?')) {
+      return
+    }
+
+    try {
+      await adminService.deleteFoodItem(id)
+      alert('Food item deleted successfully')
+      fetchFoodItems()
+    } catch (error) {
+      console.error('Error deleting food item:', error)
+      alert('Failed to delete food item')
+    }
+  }
+
+  const handleDeleteExercise = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this exercise?')) {
+      return
+    }
+
+    try {
+      await adminService.deleteExercise(id)
+      alert('Exercise deleted successfully')
+      fetchExercises()
+    } catch (error) {
+      console.error('Error deleting exercise:', error)
+      alert('Failed to delete exercise')
     }
   }
 
@@ -126,7 +192,7 @@ function AdminPage() {
       setBroadcastTargetType('all')
       setTargetUserId(null)
       alert('Broadcast sent successfully!')
-      fetchNotifications()
+      fetchBroadcastHistory()
     } catch (error) {
       console.error('Error sending broadcast:', error)
       alert('Failed to send broadcast')
@@ -160,6 +226,7 @@ function AdminPage() {
         fiber: ''
       })
       alert('Food item added successfully!')
+      fetchFoodItems()
     } catch (error) {
       console.error('Error adding food item:', error)
       alert('Failed to add food item')
@@ -189,6 +256,7 @@ function AdminPage() {
         gif_url: ''
       })
       alert('Exercise added successfully!')
+      fetchExercises()
     } catch (error) {
       console.error('Error adding exercise:', error)
       alert('Failed to add exercise')
@@ -211,13 +279,20 @@ function AdminPage() {
 
   return (
     <>
-      <div className="container-fluid py-3 px-5">
+      <div className="container-fluid py-5 px-5">
         <div className="row align-items-center">
-          <div className="col-4">
+          <div className="col-10">
             <h1 className="mb-0 bbh-bartle-regular text-pure-white">Admin Dashboard</h1>
           </div>
-          <div className="col-8">
-            <Navigation />
+          <div className="col-2 text-end">
+            <button
+              onClick={handleShow}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
+            >
+              <span style={{ fontFamily: 'bootstrap-icons', lineHeight: '1', color: 'white', fontSize: '2rem', position: 'relative', top: '-1px' }}>
+                {"\uF4D7"}
+              </span>
+            </button>
           </div>
         </div>
       </div>
@@ -288,21 +363,26 @@ function AdminPage() {
                   <i className="bi bi-megaphone"></i> Send New Broadcast
                 </Button>
 
-                <h6 className="mt-4 mb-3">Recent Broadcasts</h6>
-                {notifications.length === 0 ? (
-                  <Alert variant="info">No broadcasts sent yet.</Alert>
+                <h6 className="mt-4 mb-3 text-pure-white">Broadcast History</h6>
+                {broadcasts.length === 0 ? (
+                  <Alert variant="info" className="bg-charcoal text-pure-white">No broadcasts sent yet.</Alert>
                 ) : (
                   <div className="list-group">
-                    {notifications.map((n) => (
-                      <div key={n.id} className="list-group-item">
-                        <div className="d-flex justify-content-between align-items-center">
-                          <div>
-                            <strong>{n.title}</strong>
-                            <p className="mb-0 text-muted small">{n.message}</p>
+                    {broadcasts.map((b) => (
+                      <div key={b.id} className="list-group-item bg-charcoal text-pure-white border-0" style={{ marginBottom: '10px', borderRadius: '8px' }}>
+                        <div className="d-flex justify-content-between align-items-start">
+                          <div className="flex-1">
+                            <strong className="text-neon-yellow">{b.title}</strong>
+                            <p className="mb-2 text-off-white small">{b.message}</p>
+                            <div className="d-flex gap-2">
+                              <Badge bg={b.target_type === 'all' ? 'primary' : 'secondary'}>
+                                {b.target_type === 'all' ? 'All Users' : 'Specific User'}
+                              </Badge>
+                              <small className="text-off-white">
+                                {new Date(b.created_at).toLocaleString()}
+                              </small>
+                            </div>
                           </div>
-                          <small className="text-muted">
-                            {new Date(n.created_at).toLocaleString()}
-                          </small>
                         </div>
                       </div>
                     ))}
@@ -316,30 +396,96 @@ function AdminPage() {
             <div className="card bg-charcoal border-0">
               <div className="card-body">
                 <h5 className="card-title mb-4 text-pure-white">Database Management</h5>
-                <Alert variant="info" className="bg-charcoal text-pure-white">
-                  <p className="mb-0 text-off-white">
-                    <strong>Food Items:</strong> Add or manage food database entries.<br/>
-                    <strong>Exercises:</strong> Add or manage exercise database entries.
-                  </p>
-                </Alert>
                 <div className="row mt-3">
                   <div className="col-md-6">
                     <div className="card bg-charcoal border-0">
                       <div className="card-body">
-                        <h6 className="card-title text-neon-yellow">Food Database</h6>
-                        <Button variant="primary" className="w-100" onClick={() => setShowFoodModal(true)}>
-                          Add Food Item
-                        </Button>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <h6 className="card-title text-neon-yellow mb-0">Food Database</h6>
+                          <Button variant="primary" onClick={() => setShowFoodModal(true)}>
+                            Add Food Item
+                          </Button>
+                        </div>
+                        {foodItems.length === 0 ? (
+                          <Alert variant="info" className="bg-charcoal text-pure-white">No food items yet.</Alert>
+                        ) : (
+                          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                            <Table striped hover responsive size="sm">
+                              <thead>
+                                <tr>
+                                  <th>Name</th>
+                                  <th>Category</th>
+                                  <th>Calories</th>
+                                  <th>Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {foodItems.map((item) => (
+                                  <tr key={item.id}>
+                                    <td>{item.name}</td>
+                                    <td>{item.category}</td>
+                                    <td>{item.calories}</td>
+                                    <td>
+                                      <Button
+                                        variant="danger"
+                                        size="sm"
+                                        onClick={() => handleDeleteFoodItem(item.id)}
+                                      >
+                                        Delete
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </Table>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                   <div className="col-md-6">
                     <div className="card bg-charcoal border-0">
                       <div className="card-body">
-                        <h6 className="card-title text-neon-yellow">Exercise Database</h6>
-                        <Button variant="primary" className="w-100" onClick={() => setShowExerciseModal(true)}>
-                          Add Exercise
-                        </Button>
+                        <div className="d-flex justify-content-between align-items-center mb-3">
+                          <h6 className="card-title text-neon-yellow mb-0">Exercise Database</h6>
+                          <Button variant="primary" onClick={() => setShowExerciseModal(true)}>
+                            Add Exercise
+                          </Button>
+                        </div>
+                        {exercises.length === 0 ? (
+                          <Alert variant="info" className="bg-charcoal text-pure-white">No exercises yet.</Alert>
+                        ) : (
+                          <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                            <Table striped hover responsive size="sm">
+                              <thead>
+                                <tr>
+                                  <th>Name</th>
+                                  <th>Body Part</th>
+                                  <th>Target</th>
+                                  <th>Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {exercises.map((exercise) => (
+                                  <tr key={exercise.id}>
+                                    <td>{exercise.name}</td>
+                                    <td>{exercise.body_part}</td>
+                                    <td>{exercise.target}</td>
+                                    <td>
+                                      <Button
+                                        variant="danger"
+                                        size="sm"
+                                        onClick={() => handleDeleteExercise(exercise.id)}
+                                      >
+                                        Delete
+                                      </Button>
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </Table>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -582,6 +728,25 @@ function AdminPage() {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Profile Drawer */}
+      <Offcanvas show={showDrawer} onHide={handleClose} placement="end" className="bg-charcoal">
+        <Offcanvas.Header closeButton closeVariant="white">
+          <Offcanvas.Title className="text-pure-white text-fonts">Profile</Offcanvas.Title>
+        </Offcanvas.Header>
+        <Offcanvas.Body className="bg-charcoal">
+          <div className="mb-4">
+            <h5 className="text-pure-white text-fonts">Welcome, {user?.username || 'Admin'}!</h5>
+            <p className="text-off-white text-fonts">{user?.email}</p>
+            <Badge bg="danger" className="mb-2">
+              ADMIN
+            </Badge>
+          </div>
+          <Button variant="danger" className="w-100 border-0 text-fonts" onClick={logout}>
+            Logout
+          </Button>
+        </Offcanvas.Body>
+      </Offcanvas>
     </>
   )
 }
