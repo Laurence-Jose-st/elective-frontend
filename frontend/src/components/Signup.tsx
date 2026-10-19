@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 
 interface SignupProps {
@@ -11,7 +11,6 @@ const API_BASE = import.meta.env.VITE_API_URL || (window.location.hostname === '
 
 function Signup({ onSubmit, title = 'Signup' }: SignupProps) {
     const location = useLocation()
-    const navigate = useNavigate()
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
