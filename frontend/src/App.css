@@ -73,6 +73,31 @@ body {
   color: var(--color-off-white) !important;
 }
 
+/* Form validation dark theme */
+.form-control.is-valid {
+  border-color: #28a745 !important;
+  background-image: none !important;
+}
+
+.form-control.is-invalid {
+  border-color: #dc3545 !important;
+  background-image: none !important;
+}
+
+.valid-feedback {
+  color: #28a745 !important;
+}
+
+.invalid-feedback {
+  color: #dc3545 !important;
+}
+
+/* Verification code input styling */
+.form-control[type="text"][style*="letter-spacing"] {
+  font-family: monospace;
+  font-weight: bold;
+}
+
 /* Buttons dark theme */
 .btn-primary {
   background-color: var(--color-neon-yellow) !important;

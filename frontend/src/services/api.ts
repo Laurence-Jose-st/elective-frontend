@@ -45,7 +45,7 @@ export const loginUser = async (credentials: { email: string; password: string }
   return data;
 };
 
-export const registerUser = async (credentials: { username: string; email: string; password: string }): Promise<AuthResponse> => {
+export const registerUser = async (credentials: { username: string; email: string; password: string; verificationToken: string }): Promise<AuthResponse> => {
   const response = await fetch(`${API_BASE}/users/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
