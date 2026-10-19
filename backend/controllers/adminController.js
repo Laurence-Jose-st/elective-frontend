@@ -220,6 +220,33 @@ export const adminController = {
   },
 
   /**
+   * Delete broadcast from history
+   */
+  async deleteBroadcast(req, res) {
+    try {
+      const { id } = req.params;
+
+      console.log(`Deleting broadcast ${id}`);
+
+      await prisma.broadcasts.delete({
+        where: { id: parseInt(id) }
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Broadcast deleted successfully'
+      });
+    } catch (error) {
+      console.error('Error deleting broadcast:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete broadcast',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  },
+
+  /**
    * Get all food items
    */
   async getFoodItems(req, res) {

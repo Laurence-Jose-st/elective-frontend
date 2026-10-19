@@ -16,6 +16,7 @@ router.delete('/users/:id', adminController.deleteUser);
 // Broadcast Messaging
 router.post('/broadcast', adminController.sendBroadcast);
 router.get('/broadcasts', adminController.getBroadcastHistory);
+router.delete('/broadcasts/:id', adminController.deleteBroadcast);
 
 // Database Management
 router.get('/food', adminController.getFoodItems);

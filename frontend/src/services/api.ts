@@ -462,6 +462,21 @@ export const adminService = {
     return data;
   },
 
+  deleteBroadcast: async (id: number) => {
+    const response = await fetch(`${API_BASE}/admin/broadcasts/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders(),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to delete broadcast');
+    }
+
+    return data;
+  },
+
   addFoodItem: async (foodData: { name: string; category?: string; calories: number; protein?: number; carbs?: number; fats?: number; fiber?: number }) => {
     const response = await fetch(`${API_BASE}/admin/food`, {
       method: 'POST',
