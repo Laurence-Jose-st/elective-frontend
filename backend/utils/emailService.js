@@ -26,7 +26,7 @@ export const sendPasswordResetEmail = async (email, resetLink) => {
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Elective'}" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Password Reset Request',
       html: `
@@ -58,7 +58,7 @@ export const sendPasswordResetConfirmationEmail = async (email) => {
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Elective'}" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Password Reset Successful',
       html: `
@@ -89,7 +89,7 @@ export const sendWelcomeEmail = async (email, username) => {
     const transporter = createTransporter();
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"${process.env.EMAIL_FROM_NAME || 'Elective'}" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: 'Welcome to Our App!',
       html: `
@@ -108,6 +108,39 @@ export const sendWelcomeEmail = async (email, username) => {
     return { success: true, messageId: info.messageId };
   } catch (error) {
     console.error('Error sending welcome email:', error);
+    throw error;
+  }
+};
+
+/**
+ * Send email verification code
+ */
+export const sendVerificationCode = async (email, verificationCode) => {
+  try {
+    const transporter = createTransporter();
+
+    const mailOptions = {
+      from: `"${process.env.EMAIL_FROM_NAME || 'Elective'}" <${process.env.EMAIL_USER}>`,
+      to: email,
+      subject: 'Your Verification Code',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <h2 style="color: #333;">Your Verification Code</h2>
+          <p style="color: #666;">Thank you for registering! Please use the following verification code to complete your signup:</p>
+          <div style="background-color: #f5f5f5; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
+            <span style="font-size: 32px; font-weight: bold; letter-spacing: 4px; color: #333;">${verificationCode}</span>
+          </div>
+          <p style="color: #999; font-size: 12px;">This code will expire in 10 minutes.</p>
+          <p style="color: #666;">If you didn't request this code, please ignore this email.</p>
+        </div>
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Verification code sent:', info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('Error sending verification code:', error);
     throw error;
   }
 };

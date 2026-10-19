@@ -2,16 +2,266 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import prisma from '../lib/prisma.js';
 import { generateToken } from '../middleware/auth.js';
-import { sendPasswordResetEmail, sendPasswordResetConfirmationEmail } from '../utils/emailService.js';
+import { sendPasswordResetEmail, sendPasswordResetConfirmationEmail, sendVerificationCode } from '../utils/emailService.js';
 
 export const authController = {
   /**
-   * Register a new user
-   * Default role transitions from guest to 'registered'
+   * Validate email format and check if it's already registered
+   */
+  async validateEmail(req, res) {
+    try {
+      const { email } = req.body;
+
+      console.log('Email validation request for:', email);
+
+      if (!email) {
+        res.status(400).json({
+          success: false,
+          error: 'Email is required.',
+          code: 'EMAIL_MISSING',
+        });
+        return;
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        res.status(400).json({
+          success: false,
+          error: 'Please provide a valid email address.',
+          code: 'INVALID_EMAIL_FORMAT',
+        });
+        return;
+      }
+
+      // Check if email is already registered
+      const existingUser = await prisma.users.findUnique({
+        where: { email: email.toLowerCase().trim() }
+      });
+
+      if (existingUser) {
+        res.status(409).json({
+          success: false,
+          error: 'This email is already registered. Please log in.',
+          code: 'EMAIL_ALREADY_REGISTERED',
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Email is valid and available for registration.',
+      });
+    } catch (error) {
+      console.error('Email validation error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error during email validation.',
+        code: 'INTERNAL_SERVER_ERROR',
+      });
+    }
+  },
+
+  /**
+   * Request email verification code before signup
+   * Flow: 1. Check if email exists, 2. Validate email is real by sending code, 3. Store code
+   */
+  async requestVerification(req, res) {
+    try {
+      const { email } = req.body;
+
+      console.log('Email verification request for:', email);
+
+      if (!email) {
+        res.status(400).json({
+          success: false,
+          error: 'Email is required.',
+          code: 'EMAIL_MISSING',
+        });
+        return;
+      }
+
+      // Step 1: Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        res.status(400).json({
+          success: false,
+          error: 'Please provide a valid email address.',
+          code: 'INVALID_EMAIL_FORMAT',
+        });
+        return;
+      }
+
+      // Step 2: Check if email is already registered
+      const existingUser = await prisma.users.findUnique({
+        where: { email: email.toLowerCase().trim() }
+      });
+
+      if (existingUser) {
+        res.status(409).json({
+          success: false,
+          error: 'This email is already registered. Please log in.',
+          code: 'EMAIL_ALREADY_REGISTERED',
+        });
+        return;
+      }
+
+      // Step 3: Generate 6-digit verification code
+      const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+      const verificationTokenExpires = new Date(Date.now() + 600000); // 10 minutes
+
+      // Clean up old pending verifications for this email
+      await prisma.users.updateMany({
+        where: {
+          pending_email: email.toLowerCase().trim(),
+          is_verified: false
+        },
+        data: {
+          verification_token: null,
+          verification_token_expires: null,
+          pending_email: null
+        }
+      });
+
+      // Create a temporary user entry to store the verification code
+      const tempUser = await prisma.users.findFirst({
+        where: {
+          email: email.toLowerCase().trim(),
+          is_verified: false
+        }
+      });
+
+      if (tempUser) {
+        await prisma.users.update({
+          where: { id: tempUser.id },
+          data: {
+            verification_token: verificationCode,
+            verification_token_expires: verificationTokenExpires,
+            pending_email: email.toLowerCase().trim()
+          }
+        });
+      } else {
+        await prisma.users.create({
+          data: {
+            username: 'temp',
+            email: email.toLowerCase().trim(),
+            password_hash: 'temp',
+            role: 'REGISTERED',
+            is_verified: false,
+            verification_token: verificationCode,
+            verification_token_expires: verificationTokenExpires,
+            pending_email: email.toLowerCase().trim()
+          }
+        });
+      }
+
+      // Step 4: Send verification code email (this validates the email is real)
+      try {
+        await sendVerificationCode(email, verificationCode);
+        console.log('Verification code sent to:', email);
+      } catch (emailError) {
+        console.error('Failed to send verification code:', emailError.message);
+
+        // If the email is undeliverable, it's likely not a real email
+        if (emailError.code === 'EENVELOPE' || emailError.responseCode === 550 || emailError.responseCode === 553) {
+          res.status(400).json({
+            success: false,
+            error: 'The email address does not exist or cannot receive emails. Please use a valid email address.',
+            code: 'EMAIL_NOT_REAL',
+          });
+          return;
+        }
+
+        res.status(500).json({
+          success: false,
+          error: 'Failed to send verification code. Please try again.',
+          code: 'EMAIL_SEND_FAILED',
+        });
+        return;
+      }
+
+      res.status(200).json({
+        success: true,
+        message: 'Verification code sent. Please check your inbox to continue signup.',
+      });
+    } catch (error) {
+      console.error('Email verification request error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error during email verification request.',
+        code: 'INTERNAL_SERVER_ERROR',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      });
+    }
+  },
+
+  /**
+   * Verify email using code and return email for signup
+   */
+  async verifyEmail(req, res) {
+    try {
+      const { email, code } = req.body;
+
+      console.log('Email verification request with code');
+
+      if (!email || !code) {
+        console.log('Email verification failed: Missing email or code');
+        res.status(400).json({
+          success: false,
+          error: 'Email and verification code are required.',
+          code: 'CREDENTIALS_MISSING',
+        });
+        return;
+      }
+
+      console.log('Finding user with verification code');
+      const user = await prisma.users.findFirst({
+        where: {
+          pending_email: email.toLowerCase().trim(),
+          verification_token: code,
+          verification_token_expires: {
+            gt: new Date()
+          }
+        }
+      });
+
+      if (!user) {
+        console.log('Email verification failed: Invalid or expired code');
+        res.status(400).json({
+          success: false,
+          error: 'Invalid or expired verification code. Please request a new code.',
+          code: 'INVALID_CODE',
+        });
+        return;
+      }
+
+      console.log('Email verification successful for:', user.pending_email);
+
+      res.status(200).json({
+        success: true,
+        message: 'Email verified successfully. You can now complete your signup.',
+        data: {
+          email: user.pending_email,
+          verificationToken: user.verification_token
+        }
+      });
+    } catch (error) {
+      console.error('Email verification error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error during email verification.',
+        code: 'INTERNAL_SERVER_ERROR',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      });
+    }
+  },
+
+  /**
+   * Register a new user (after email verification)
    */
   async signup(req, res) {
     try {
-      const { username, email, password, profile } = req.body;
+      const { username, email, password, verificationToken } = req.body;
 
       console.log('Signup attempt for email:', email);
 
@@ -35,6 +285,7 @@ export const authController = {
         return;
       }
 
+      // Verify the email with the token
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         console.log('Signup failed: Invalid email format');
@@ -46,18 +297,23 @@ export const authController = {
         return;
       }
 
-      // Check if user already exists
-      console.log('Checking if user already exists');
-      const existingUser = await prisma.users.findUnique({
-        where: { email: email.toLowerCase().trim() }
+      // Check if there's a pending verification for this email
+      const pendingUser = await prisma.users.findFirst({
+        where: {
+          pending_email: email.toLowerCase().trim(),
+          verification_token: verificationToken,
+          verification_token_expires: {
+            gt: new Date()
+          }
+        }
       });
 
-      if (existingUser) {
-        console.log('Signup failed: User already exists');
-        res.status(409).json({
+      if (!pendingUser) {
+        console.log('Signup failed: Email not verified or verification expired');
+        res.status(400).json({
           success: false,
-          error: 'An account with this email address already exists. Please log in.',
-          code: 'USER_ALREADY_EXISTS',
+          error: 'Email verification required or expired. Please verify your email first.',
+          code: 'EMAIL_NOT_VERIFIED',
         });
         return;
       }
@@ -70,14 +326,19 @@ export const authController = {
       // Default role upon signup is 'REGISTERED' (matching schema)
       const role = 'REGISTERED';
 
-      console.log('Creating new user');
-      const newUser = await prisma.users.create({
+      console.log('Updating user with signup data');
+      const newUser = await prisma.users.update({
+        where: { id: pendingUser.id },
         data: {
           username: username.trim(),
           email: email.toLowerCase().trim(),
           password_hash: passwordHash,
           role: role,
           flagged: false,
+          is_verified: true,
+          verification_token: null,
+          verification_token_expires: null,
+          pending_email: null
         }
       });
 
@@ -97,7 +358,7 @@ export const authController = {
       console.log('Signup successful for user:', newUser.id);
       res.status(201).json({
         success: true,
-        message: 'Account registered successfully. User tier upgraded to Registered.',
+        message: 'Account registered successfully.',
         data: {
           token,
           user: {
@@ -106,6 +367,7 @@ export const authController = {
             email: newUser.email,
             role: newUser.role,
             flagged: newUser.flagged,
+            isVerified: newUser.is_verified,
             createdAt: newUser.created_at,
           },
         },

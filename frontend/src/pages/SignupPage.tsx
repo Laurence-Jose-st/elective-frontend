@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 function SignupPage() {
   const { login } = useAuth()
 
-  const handleSignup = async (data: { username: string; email: string; password: string }) => {
+  const handleSignup = async (data: { username: string; email: string; password: string; verificationToken: string }) => {
     try {
       const response = await registerUser(data)
       console.log('User signed up:', response)
