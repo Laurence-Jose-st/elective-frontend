@@ -101,6 +101,7 @@ export const adminController = {
   async sendBroadcast(req, res) {
     try {
       const { title, message, targetType, targetUserId } = req.body;
+      const sentBy = req.user?.userId || 1; // Default to admin if not available
 
       console.log('Sending broadcast:', { title, message, targetType, targetUserId });
 
@@ -131,20 +132,19 @@ export const adminController = {
 
       console.log(`Found ${usersToNotify.length} users to notify`);
 
+      // Save broadcast to history
+      const broadcast = await prisma.broadcasts.create({
+        data: {
+          title,
+          message,
+          target_type: targetType,
+          target_user_id: targetType === 'specific' ? parseInt(targetUserId) : null,
+          sent_by: parseInt(sentBy)
+        }
+      });
+
       // Create notifications for all target users
       let notifications = [];
-      
-      // Check if notifications model exists in Prisma client
-      if (!prisma.notifications) {
-        console.log('Notifications model not found in Prisma client - table may not exist in database');
-        res.status(200).json({
-          success: true,
-          message: `Broadcast prepared for ${usersToNotify.length} user(s). Note: Notifications table may need migration.`,
-          warning: 'Notifications table not found in database',
-          usersNotified: usersToNotify.length
-        });
-        return;
-      }
 
       try {
         notifications = await Promise.all(
@@ -161,12 +161,13 @@ export const adminController = {
         );
       } catch (notificationError) {
         console.error('Error creating notifications (table may not exist):', notificationError);
-        // If notifications table doesn't exist, still return success but warn
+        // If notifications table doesn't exist, still save broadcast but warn
         res.status(200).json({
           success: true,
-          message: `Broadcast prepared for ${usersToNotify.length} user(s). Note: Notifications table may need migration.`,
+          message: `Broadcast saved to history. Note: Some users may not have received notifications.`,
           warning: 'Notifications table may not exist in database yet',
-          usersNotified: usersToNotify.length
+          usersNotified: usersToNotify.length,
+          broadcast
         });
         return;
       }
@@ -174,13 +175,155 @@ export const adminController = {
       res.status(200).json({
         success: true,
         message: `Broadcast sent to ${notifications.length} user(s)`,
-        data: notifications
+        data: {
+          broadcast,
+          notifications,
+          usersNotified: notifications.length
+        }
       });
     } catch (error) {
       console.error('Error sending broadcast:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to send broadcast',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  },
+
+  /**
+   * Get broadcast history
+   */
+  async getBroadcastHistory(req, res) {
+    try {
+      console.log('Fetching broadcast history');
+
+      const broadcasts = await prisma.broadcasts.findMany({
+        orderBy: {
+          created_at: 'desc'
+        },
+        take: 50
+      });
+
+      res.status(200).json({
+        success: true,
+        data: broadcasts
+      });
+    } catch (error) {
+      console.error('Error fetching broadcast history:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch broadcast history',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  },
+
+  /**
+   * Get all food items
+   */
+  async getFoodItems(req, res) {
+    try {
+      console.log('Fetching food items');
+
+      const foodItems = await prisma.food_items.findMany({
+        orderBy: {
+          created_at: 'desc'
+        },
+        take: 100
+      });
+
+      res.status(200).json({
+        success: true,
+        data: foodItems
+      });
+    } catch (error) {
+      console.error('Error fetching food items:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch food items',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  },
+
+  /**
+   * Get all exercises
+   */
+  async getExercises(req, res) {
+    try {
+      console.log('Fetching exercises');
+
+      const exercises = await prisma.exercises.findMany({
+        orderBy: {
+          name: 'asc'
+        },
+        take: 100
+      });
+
+      res.status(200).json({
+        success: true,
+        data: exercises
+      });
+    } catch (error) {
+      console.error('Error fetching exercises:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch exercises',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  },
+
+  /**
+   * Delete food item
+   */
+  async deleteFoodItem(req, res) {
+    try {
+      const { id } = req.params;
+
+      console.log(`Deleting food item ${id}`);
+
+      await prisma.food_items.delete({
+        where: { id: parseInt(id) }
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Food item deleted successfully'
+      });
+    } catch (error) {
+      console.error('Error deleting food item:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete food item',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  },
+
+  /**
+   * Delete exercise
+   */
+  async deleteExercise(req, res) {
+    try {
+      const { id } = req.params;
+
+      console.log(`Deleting exercise ${id}`);
+
+      await prisma.exercises.delete({
+        where: { id }
+      });
+
+      res.status(200).json({
+        success: true,
+        message: 'Exercise deleted successfully'
+      });
+    } catch (error) {
+      console.error('Error deleting exercise:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to delete exercise',
         details: process.env.NODE_ENV === 'development' ? error.message : undefined
       });
     }
