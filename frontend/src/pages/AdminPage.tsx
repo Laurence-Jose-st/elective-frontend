@@ -188,6 +188,21 @@ function AdminPage() {
     }
   }
 
+  const handleDeleteBroadcast = async (id: number) => {
+    if (!window.confirm('Are you sure you want to delete this broadcast from history?')) {
+      return
+    }
+
+    try {
+      await adminService.deleteBroadcast(id)
+      alert('Broadcast deleted successfully')
+      fetchBroadcastHistory()
+    } catch (error) {
+      console.error('Error deleting broadcast:', error)
+      alert('Failed to delete broadcast')
+    }
+  }
+
   const handleAddFoodItem = async () => {
     if (!foodForm.name || !foodForm.calories) {
       alert('Please fill in food name and calories')
@@ -258,7 +273,7 @@ function AdminPage() {
         <Alert variant="danger">
           <Alert.Heading>Access Denied</Alert.Heading>
           <p>You don't have permission to access this page.</p>
-          <Button variant="primary" onClick={() => window.location.href = '/dashboard'}>
+          <Button variant="primary" className="rounded" onClick={() => window.location.href = '/dashboard'}>
             Go to Dashboard
           </Button>
         </Alert>
@@ -286,13 +301,13 @@ function AdminPage() {
         </div>
       </div>
 
-      <div className="container mt-4">
-        <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k as any)} className="mb-4">
+      <div className="container mt-4 mb-5">
+        <Tabs activeKey={activeTab} onSelect={(k) => setActiveTab(k as any)} className="mb-4 text-fonts">
           <Tab eventKey="users" title="User Management">
-            <div className="card bg-charcoal border-0">
+            <div className="card bg-charcoal">
               <div className="card-body">
-                <h5 className="card-title mb-4 text-pure-white">All Users</h5>
-                <Table striped hover responsive>
+                <h5 className="card-title mb-4 mt-3 ms-3 text-pure-white text-fonts">All Users</h5>
+                <Table striped hover responsive className="p-3 rounded">
                   <thead>
                     <tr>
                       <th>ID</th>
@@ -323,7 +338,7 @@ function AdminPage() {
                           <Button
                             variant={u.flagged ? "success" : "warning"}
                             size="sm"
-                            className="me-2"
+                            className="me-2 rounded"
                             onClick={() => handleFlagUser(u.id)}
                           >
                             {u.flagged ? 'Unflag' : 'Flag'}
@@ -331,6 +346,7 @@ function AdminPage() {
                           <Button
                             variant="danger"
                             size="sm"
+                            className="rounded"
                             onClick={() => handleDeleteUser(u.id)}
                           >
                             Delete
@@ -345,14 +361,14 @@ function AdminPage() {
           </Tab>
 
           <Tab eventKey="broadcast" title="Broadcast Messaging">
-            <div className="card bg-charcoal border-0">
+            <div className="card bg-charcoal rounded">
               <div className="card-body">
-                <h5 className="card-title mb-4 text-pure-white">Send Broadcast</h5>
-                <Button variant="primary" onClick={() => setShowBroadcastModal(true)}>
-                  <i className="bi bi-megaphone"></i> Send New Broadcast
+                <h5 className="card-title mb-2 mt-3 ms-3 text-pure-white text-fonts">Send Broadcast</h5>
+                <Button variant="primary" className="rounded mt-2 ms-3 btn d-inline-flex align-items-center px-4 py-2 border-0" onClick={() => setShowBroadcastModal(true)}>
+                  New Broadcast
                 </Button>
 
-                <h6 className="mt-4 mb-3 text-pure-white">Broadcast History</h6>
+                <h6 className="mt-4 mb-2 ms-3 text-pure-white">Broadcast History</h6>
                 {broadcasts.length === 0 ? (
                   <Alert variant="info" className="bg-charcoal text-pure-white">No broadcasts sent yet.</Alert>
                 ) : (
@@ -372,6 +388,14 @@ function AdminPage() {
                               </small>
                             </div>
                           </div>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            className="rounded"
+                            onClick={() => handleDeleteBroadcast(b.id)}
+                          >
+                            Delete
+                          </Button>
                         </div>
                       </div>
                     ))}
@@ -382,24 +406,24 @@ function AdminPage() {
           </Tab>
 
           <Tab eventKey="database" title="Database Management">
-            <div className="card bg-charcoal border-0">
+            <div className="card bg-charcoal rounded">
               <div className="card-body">
-                <h5 className="card-title mb-4 text-pure-white">Database Management</h5>
+                <h5 className="card-title mb-2 mt-3 ms-3 text-pure-white text-fonts">Database Management</h5>
                 <div className="row mt-3">
                   <div className="col-md-6">
-                    <div className="card bg-charcoal border-0">
+                    <div className="card bg-charcoal rounded">
                       <div className="card-body">
                         <div className="d-flex justify-content-between align-items-center mb-3">
                           <h6 className="card-title text-neon-yellow mb-0">Food Database</h6>
-                          <Button variant="primary" onClick={() => setShowFoodModal(true)}>
-                            Add Food Item
+                          <Button variant="primary" className="rounded d-inline-flex align-items-center" onClick={() => setShowFoodModal(true)}>
+                            <i className="bi bi-plus-lg me-2 d-flex align-items-center"></i>Add Food Item
                           </Button>
                         </div>
                         {foodItems.length === 0 ? (
                           <Alert variant="info" className="bg-charcoal text-pure-white">No food items yet.</Alert>
                         ) : (
                           <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                            <Table striped hover responsive size="sm">
+                            <Table striped hover responsive size="sm" className="p-3 rounded">
                               <thead>
                                 <tr>
                                   <th>Name</th>
@@ -418,6 +442,7 @@ function AdminPage() {
                                       <Button
                                         variant="danger"
                                         size="sm"
+                                        className="rounded"
                                         onClick={() => handleDeleteFoodItem(item.id)}
                                       >
                                         Delete
@@ -433,19 +458,19 @@ function AdminPage() {
                     </div>
                   </div>
                   <div className="col-md-6">
-                    <div className="card bg-charcoal border-0">
+                    <div className="card bg-charcoal rounded">
                       <div className="card-body">
                         <div className="d-flex justify-content-between align-items-center mb-3">
                           <h6 className="card-title text-neon-yellow mb-0">Exercise Database</h6>
-                          <Button variant="primary" onClick={() => setShowExerciseModal(true)}>
-                            Add Exercise
+                          <Button variant="primary" className="rounded d-inline-flex align-items-center" onClick={() => setShowExerciseModal(true)}>
+                            <i className="bi bi-plus-lg me-2 d-flex align-items-center"></i> Add Exercise
                           </Button>
                         </div>
                         {exercises.length === 0 ? (
                           <Alert variant="info" className="bg-charcoal text-pure-white">No exercises yet.</Alert>
                         ) : (
                           <div style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                            <Table striped hover responsive size="sm">
+                            <Table striped hover responsive size="sm" className="p-3 rounded">
                               <thead>
                                 <tr>
                                   <th>Name</th>
@@ -464,6 +489,7 @@ function AdminPage() {
                                       <Button
                                         variant="danger"
                                         size="sm"
+                                        className="rounded"
                                         onClick={() => handleDeleteExercise(exercise.id)}
                                       >
                                         Delete
@@ -496,6 +522,7 @@ function AdminPage() {
               <Form.Label>Title</Form.Label>
               <Form.Control
                 type="text"
+                className="rounded"
                 value={broadcastTitle}
                 onChange={(e) => setBroadcastTitle(e.target.value)}
                 placeholder="Enter broadcast title..."
@@ -504,6 +531,7 @@ function AdminPage() {
             <Form.Group className="mb-3">
               <Form.Label>Target Audience</Form.Label>
               <Form.Select
+                className="rounded"
                 value={broadcastTargetType}
                 onChange={(e) => setBroadcastTargetType(e.target.value as 'all' | 'specific')}
               >
@@ -515,6 +543,7 @@ function AdminPage() {
               <Form.Group className="mb-3">
                 <Form.Label>Select User</Form.Label>
                 <Form.Select
+                  className="rounded"
                   value={targetUserId || ''}
                   onChange={(e) => setTargetUserId(Number(e.target.value))}
                 >
@@ -530,6 +559,7 @@ function AdminPage() {
               <Form.Control
                 as="textarea"
                 rows={4}
+                className="rounded"
                 value={broadcastMessage}
                 onChange={(e) => setBroadcastMessage(e.target.value)}
                 placeholder="Enter your message..."
@@ -538,10 +568,10 @@ function AdminPage() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowBroadcastModal(false)}>
+          <Button variant="secondary" className="rounded" onClick={() => setShowBroadcastModal(false)}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSendBroadcast}>
+          <Button variant="primary" className="rounded" onClick={handleSendBroadcast}>
             Send Broadcast
           </Button>
         </Modal.Footer>
@@ -558,6 +588,7 @@ function AdminPage() {
               <Form.Label>Food Name</Form.Label>
               <Form.Control
                 type="text"
+                className="rounded"
                 value={foodForm.name}
                 onChange={(e) => setFoodForm({ ...foodForm, name: e.target.value })}
                 placeholder="Enter food name..."
@@ -566,6 +597,7 @@ function AdminPage() {
             <Form.Group className="mb-3">
               <Form.Label>Category</Form.Label>
               <Form.Select
+                className="rounded"
                 value={foodForm.category}
                 onChange={(e) => setFoodForm({ ...foodForm, category: e.target.value })}
               >
@@ -583,6 +615,7 @@ function AdminPage() {
               <Form.Label>Calories (per 100g)</Form.Label>
               <Form.Control
                 type="number"
+                className="rounded"
                 value={foodForm.calories}
                 onChange={(e) => setFoodForm({ ...foodForm, calories: e.target.value })}
                 placeholder="Calories"
@@ -592,6 +625,7 @@ function AdminPage() {
               <Form.Label>Protein (g)</Form.Label>
               <Form.Control
                 type="number"
+                className="rounded"
                 value={foodForm.protein}
                 onChange={(e) => setFoodForm({ ...foodForm, protein: e.target.value })}
                 placeholder="Protein"
@@ -601,6 +635,7 @@ function AdminPage() {
               <Form.Label>Carbs (g)</Form.Label>
               <Form.Control
                 type="number"
+                className="rounded"
                 value={foodForm.carbs}
                 onChange={(e) => setFoodForm({ ...foodForm, carbs: e.target.value })}
                 placeholder="Carbs"
@@ -610,6 +645,7 @@ function AdminPage() {
               <Form.Label>Fats (g)</Form.Label>
               <Form.Control
                 type="number"
+                className="rounded"
                 value={foodForm.fats}
                 onChange={(e) => setFoodForm({ ...foodForm, fats: e.target.value })}
                 placeholder="Fats"
@@ -619,6 +655,7 @@ function AdminPage() {
               <Form.Label>Fiber (g)</Form.Label>
               <Form.Control
                 type="number"
+                className="rounded"
                 value={foodForm.fiber}
                 onChange={(e) => setFoodForm({ ...foodForm, fiber: e.target.value })}
                 placeholder="Fiber"
@@ -627,10 +664,10 @@ function AdminPage() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowFoodModal(false)}>
+          <Button variant="secondary" className="rounded" onClick={() => setShowFoodModal(false)}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleAddFoodItem}>
+          <Button variant="primary" className="rounded" onClick={handleAddFoodItem}>
             Add Food Item
           </Button>
         </Modal.Footer>
@@ -647,6 +684,7 @@ function AdminPage() {
               <Form.Label>Exercise Name</Form.Label>
               <Form.Control
                 type="text"
+                className="rounded"
                 value={exerciseForm.name}
                 onChange={(e) => setExerciseForm({ ...exerciseForm, name: e.target.value })}
                 placeholder="Enter exercise name..."
@@ -655,6 +693,7 @@ function AdminPage() {
             <Form.Group className="mb-3">
               <Form.Label>Body Part</Form.Label>
               <Form.Select
+                className="rounded"
                 value={exerciseForm.body_part}
                 onChange={(e) => setExerciseForm({ ...exerciseForm, body_part: e.target.value })}
               >
@@ -671,6 +710,7 @@ function AdminPage() {
             <Form.Group className="mb-3">
               <Form.Label>Target Muscle</Form.Label>
               <Form.Select
+                className="rounded"
                 value={exerciseForm.target}
                 onChange={(e) => setExerciseForm({ ...exerciseForm, target: e.target.value })}
               >
@@ -684,6 +724,7 @@ function AdminPage() {
             <Form.Group className="mb-3">
               <Form.Label>Equipment</Form.Label>
               <Form.Select
+                className="rounded"
                 value={exerciseForm.equipment}
                 onChange={(e) => setExerciseForm({ ...exerciseForm, equipment: e.target.value })}
               >
@@ -701,6 +742,7 @@ function AdminPage() {
               <Form.Label>GIF URL (Optional)</Form.Label>
               <Form.Control
                 type="text"
+                className="rounded"
                 value={exerciseForm.gif_url}
                 onChange={(e) => setExerciseForm({ ...exerciseForm, gif_url: e.target.value })}
                 placeholder="Enter GIF URL..."
@@ -709,10 +751,10 @@ function AdminPage() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowExerciseModal(false)}>
+          <Button variant="secondary" className="rounded" onClick={() => setShowExerciseModal(false)}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleAddExercise}>
+          <Button variant="primary" className="rounded" onClick={handleAddExercise}>
             Add Exercise
           </Button>
         </Modal.Footer>
@@ -731,7 +773,7 @@ function AdminPage() {
               ADMIN
             </Badge>
           </div>
-          <Button variant="danger" className="w-100 border-0 text-fonts" onClick={logout}>
+          <Button variant="danger" className="w-100 border-0 text-fonts rounded" onClick={logout}>
             Logout
           </Button>
         </Offcanvas.Body>
