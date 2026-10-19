@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import prisma from '../lib/prisma.js';
 import { generateToken } from '../middleware/auth.js';
+import { sendPasswordResetEmail, sendPasswordResetConfirmationEmail } from '../utils/emailService.js';
 
 export const authController = {
   /**
@@ -409,11 +410,21 @@ export const authController = {
 
         console.log('Reset token generated:', resetToken);
         console.log('Reset token expires at:', resetTokenExpires);
-        
-        // TODO: Send email with reset link
-        // For now, log the reset link to console
+
+        // Send email with reset link
         const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password?token=${resetToken}`;
         console.log('Reset link:', resetLink);
+
+        try {
+          await sendPasswordResetEmail(user.email, resetLink);
+          console.log('Password reset email sent to:', user.email);
+        } catch (emailError) {
+          console.error('Failed to send password reset email:', emailError.message);
+          console.error('Email error details:', emailError);
+          console.log('Reset link (email failed):', resetLink);
+          // Continue anyway - token is generated and stored
+          // The user can still reset password using the link from console for testing
+        }
       } else {
         console.log('User not found, but returning success for security');
       }
@@ -497,6 +508,16 @@ export const authController = {
       });
 
       console.log('Password reset successful for user:', user.id);
+
+      // Send confirmation email
+      try {
+        await sendPasswordResetConfirmationEmail(user.email);
+        console.log('Password reset confirmation email sent to:', user.email);
+      } catch (emailError) {
+        console.error('Failed to send password reset confirmation email:', emailError);
+        // Continue anyway - password is already reset
+      }
+
       res.status(200).json({
         success: true,
         message: 'Password has been reset successfully. You can now log in with your new password.',

@@ -42,50 +42,51 @@ function ForgotPasswordPage() {
   }
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div className="d-flex justify-content-center align-items-center vh-100">
       <div className="col-md-6 col-lg-4">
-        <div className="card shadow">
+        <div className="card shadow bg-charcoal border-0 rounded-4">
           <div className="card-body p-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2 className="card-title text-center mb-0">Forgot Password</h2>
+              <h2 className="card-title text-center mb-0 text-pure-white text-fonts">Forgot Password</h2>
               <a
                 href="/login"
-                className="text-decoration-none"
-                style={{ color: '#6c757d', fontSize: '0.9rem' }}
+                className="text-decoration-none text-off-white text-fonts"
+                style={{ fontSize: '0.9rem' }}
               >
                 <i className="bi bi-arrow-left"></i> Back
               </a>
             </div>
 
             {success ? (
-              <Alert variant="success">
-                <Alert.Heading>Password Reset Email Sent</Alert.Heading>
-                <p className="mb-0">
+              <Alert variant="success" className="bg-charcoal border-0 text-pure-white">
+                <Alert.Heading className="text-pure-white">Password Reset Email Sent</Alert.Heading>
+                <p className="mb-0 text-off-white text-fonts">
                   If an account exists with the email you provided, you will receive password reset instructions shortly.
                 </p>
                 <div className="mt-3">
-                  <Button variant="primary" onClick={() => window.location.href = '/login'}>
+                  <Button variant="primary" className="border-0 text-fonts" onClick={() => window.location.href = '/login'}>
                     Return to Login
                   </Button>
                 </div>
               </Alert>
             ) : (
               <>
-                <p className="text-muted mb-4">
+                <p className="text-off-white text-fonts mb-4">
                   Enter your email address and we'll send you instructions to reset your password.
                 </p>
 
                 {error && (
-                  <div className="alert alert-danger" role="alert">
+                  <div className="alert alert-danger bg-charcoal border-0 text-pure-white" role="alert">
                     {error}
                   </div>
                 )}
 
                 <Form onSubmit={handleSubmit}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Email address</Form.Label>
+                    <Form.Label className="text-pure-white text-fonts">Email address</Form.Label>
                     <Form.Control
                       type="email"
+                      className="border-0 border-bottom bg-charcoal text-pure-white text-fonts"
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -96,7 +97,7 @@ function ForgotPasswordPage() {
                   <Button
                     variant="primary"
                     type="submit"
-                    className="w-100"
+                    className="w-100 border-0 text-fonts"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -111,8 +112,8 @@ function ForgotPasswordPage() {
                 </Form>
 
                 <div className="mt-3 text-center">
-                  <span className="text-muted">Remember your password? </span>
-                  <a href="/login" className="text-decoration-none">
+                  <span className="text-off-white text-fonts">Remember your password? </span>
+                  <a href="/login" className="text-decoration-none text-pure-white text-fonts">
                     Login
                   </a>
                 </div>

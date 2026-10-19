@@ -4,6 +4,8 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { Button, Form, Alert } from 'react-bootstrap'
 import '../App.css'
 
+const API_BASE = import.meta.env.VITE_API_URL || (window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : 'https://my-working-backend.vercel.app/api')
+
 function ResetPasswordPage() {
   const [searchParams] = useSearchParams()
   const [token, setToken] = useState('')
@@ -44,7 +46,7 @@ function ResetPasswordPage() {
     setIsLoading(true)
 
     try {
-      const response = await fetch('http://localhost:5000/users/auth/reset-password', {
+      const response = await fetch(`${API_BASE}/users/auth/reset-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -72,50 +74,51 @@ function ResetPasswordPage() {
   }
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div className="d-flex justify-content-center align-items-center vh-100">
       <div className="col-md-6 col-lg-4">
-        <div className="card shadow">
+        <div className="card shadow bg-charcoal border-0 rounded-4">
           <div className="card-body p-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
-              <h2 className="card-title text-center mb-0">Reset Password</h2>
+              <h2 className="card-title text-center mb-0 text-pure-white text-fonts">Reset Password</h2>
               <a
                 href="/login"
-                className="text-decoration-none"
-                style={{ color: '#6c757d', fontSize: '0.9rem' }}
+                className="text-decoration-none text-off-white text-fonts"
+                style={{ fontSize: '0.9rem' }}
               >
                 <i className="bi bi-arrow-left"></i> Back
               </a>
             </div>
 
             {success ? (
-              <Alert variant="success">
-                <Alert.Heading>Password Reset Successful</Alert.Heading>
-                <p className="mb-0">
+              <Alert variant="success" className="bg-charcoal border-0 text-pure-white">
+                <Alert.Heading className="text-pure-white">Password Reset Successful</Alert.Heading>
+                <p className="mb-0 text-off-white text-fonts">
                   Your password has been reset successfully. You can now log in with your new password.
                 </p>
                 <div className="mt-3">
-                  <Button variant="primary" onClick={() => window.location.href = '/login'}>
+                  <Button variant="primary" className="border-0 text-fonts" onClick={() => window.location.href = '/login'}>
                     Go to Login
                   </Button>
                 </div>
               </Alert>
             ) : (
               <>
-                <p className="text-muted mb-4">
+                <p className="text-off-white text-fonts mb-4">
                   Enter your new password below.
                 </p>
 
                 {error && (
-                  <div className="alert alert-danger" role="alert">
+                  <div className="alert alert-danger bg-charcoal border-0 text-pure-white" role="alert">
                     {error}
                   </div>
                 )}
 
                 <Form onSubmit={handleSubmit}>
                   <Form.Group className="mb-3">
-                    <Form.Label>New Password</Form.Label>
+                    <Form.Label className="text-pure-white text-fonts">New Password</Form.Label>
                     <Form.Control
                       type="password"
+                      className="border-0 border-bottom bg-charcoal text-pure-white text-fonts"
                       placeholder="Enter new password (min 6 characters)"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
@@ -125,9 +128,10 @@ function ResetPasswordPage() {
                   </Form.Group>
 
                   <Form.Group className="mb-3">
-                    <Form.Label>Confirm Password</Form.Label>
+                    <Form.Label className="text-pure-white text-fonts">Confirm Password</Form.Label>
                     <Form.Control
                       type="password"
+                      className="border-0 border-bottom bg-charcoal text-pure-white text-fonts"
                       placeholder="Confirm new password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -139,7 +143,7 @@ function ResetPasswordPage() {
                   <Button
                     variant="primary"
                     type="submit"
-                    className="w-100"
+                    className="w-100 border-0 text-fonts"
                     disabled={isLoading || !token}
                   >
                     {isLoading ? (
