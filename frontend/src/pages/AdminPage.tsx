@@ -9,7 +9,6 @@ function AdminPage() {
   const { user, logout } = useAuth()
   const [activeTab, setActiveTab] = useState<'users' | 'broadcast' | 'database'>('users')
   const [users, setUsers] = useState<any[]>([])
-  const [notifications, setNotifications] = useState<any[]>([])
   const [broadcasts, setBroadcasts] = useState<any[]>([])
   const [foodItems, setFoodItems] = useState<any[]>([])
   const [exercises, setExercises] = useState<any[]>([])
@@ -55,7 +54,6 @@ function AdminPage() {
       return
     }
     fetchUsers()
-    fetchNotifications()
     fetchBroadcastHistory()
     fetchFoodItems()
     fetchExercises()
@@ -70,15 +68,6 @@ function AdminPage() {
     } catch (error) {
       console.error('Error fetching users:', error)
       alert('Failed to fetch users from backend')
-    }
-  }
-
-  const fetchNotifications = async () => {
-    try {
-      // TODO: Implement API call to fetch notifications
-      setNotifications([])
-    } catch (error) {
-      console.error('Error fetching notifications:', error)
     }
   }
 
