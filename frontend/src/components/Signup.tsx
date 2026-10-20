@@ -22,6 +22,7 @@ function Signup({ onSubmit, title = 'Signup' }: SignupProps) {
     const [isVerifying, setIsVerifying] = useState(false)
     const [codeSent, setCodeSent] = useState(false)
     const [emailVerified, setEmailVerified] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
 
     // Check if user came from email verification
     useEffect(() => {
@@ -268,15 +269,29 @@ function Signup({ onSubmit, title = 'Signup' }: SignupProps) {
                                 <label htmlFor="password" className="form-label text-pure-white text-fonts">
                                     Password
                                 </label>
-                                <input
-                                    type="password"
-                                    className="form-control border-0 border-bottom bg-charcoal text-pure-white text-fonts"
-                                    id="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    placeholder="Enter your password (min 6 characters)"
-                                />
+                                <div className="position-relative">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        className="form-control border-0 border-bottom bg-charcoal text-pure-white text-fonts"
+                                        id="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                        placeholder="Enter your password (min 6 characters)"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent"
+                                        style={{ right: '10px', color: '#ecececb6', cursor: 'pointer' }}
+                                        onClick={() => setShowPassword(!showPassword)}
+                                    >
+                                        {showPassword ? (
+                                            <i className="bi bi-eye-slash"></i>
+                                        ) : (
+                                            <i className="bi bi-eye"></i>
+                                        )}
+                                    </button>
+                                </div>
                             </div>
 
                             <button

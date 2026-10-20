@@ -24,6 +24,7 @@ function Login({
   const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -127,20 +128,34 @@ function Login({
                       <label htmlFor="password" className="form-label" style={{ color: '#fff' }}>
                         Password
                       </label>
-                      <input
-                        type="password"
-                        className="form-control"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                        placeholder="Enter your password"
-                        style={{
-                          backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                          borderColor: 'rgba(255, 255, 255, 0.3)',
-                          color: '#fff'
-                        }}
-                      />
+                      <div className="position-relative">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          className="form-control"
+                          id="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                          placeholder="Enter your password"
+                          style={{
+                            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                            borderColor: 'rgba(255, 255, 255, 0.3)',
+                            color: '#fff'
+                          }}
+                        />
+                        <button
+                          type="button"
+                          className="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent"
+                          style={{ right: '10px', color: '#fff', cursor: 'pointer' }}
+                          onClick={() => setShowPassword(!showPassword)}
+                        >
+                          {showPassword ? (
+                            <i className="bi bi-eye-slash"></i>
+                          ) : (
+                            <i className="bi bi-eye"></i>
+                          )}
+                        </button>
+                      </div>
                     </div>
 
                     {customFields && <div className="mb-3">{customFields}</div>}

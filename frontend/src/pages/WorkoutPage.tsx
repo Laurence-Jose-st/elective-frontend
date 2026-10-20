@@ -641,7 +641,7 @@ function WorkoutPage() {
 
                       {/* Duration Tracking */}
                       <div className="mb-3">
-                        <label className="form-label fw-bold">Duration Tracking</label>
+                        <label className="form-label fw-bold text-pure-white">Duration Tracking</label>
                         <ButtonGroup className="mb-3 w-100">
                           <Button
                             variant={durationMode === 'timer' ? 'primary' : 'outline-primary'}
@@ -682,7 +682,7 @@ function WorkoutPage() {
                                   key={preset.value}
                                   variant={manualDuration === preset.value ? 'primary' : 'outline-primary'}
                                   size="sm"
-                                  className="border-0 btn-font text-off-white"
+                                  className="border-0 btn-font text-pure-white"
                                   onClick={() => setManualDuration(preset.value)}
                                 >
                                   {preset.label}
@@ -700,10 +700,10 @@ function WorkoutPage() {
                                 }}
                                 min="1"
                                 max="720"
-                                className={`flex-grow-1 border-0 border-bottom ${validationErrors.manualDuration ? 'border-danger' : ''}`}
+                                className={`flex-grow-1 border-0 border-bottom bg-charcoal text-pure-white ${validationErrors.manualDuration ? 'border-danger' : ''}`}
                               />
                               {validationErrors.manualDuration && (
-                                <small className="bg-charcoal text-white" style={{ fontSize: '0.7rem' }}>
+                                <small className="bg-charcoal text-pure-white" style={{ fontSize: '0.7rem' }}>
                                   {validationErrors.manualDuration}
                                 </small>
                               )}
@@ -711,7 +711,7 @@ function WorkoutPage() {
                                 value={manualDurationUnit}
                                 onChange={(e) => setManualDurationUnit(e.target.value as any)}
                                 style={{ width: '100px' }}
-                                className="border-0 border-bottom"
+                                className="border-0 border-bottom bg-charcoal text-pure-white"
                               >
                                 <option value="min">min</option>
                                 <option value="hrs">hrs</option>
@@ -902,12 +902,14 @@ function WorkoutPage() {
                       </div>
 
                       <div className="d-flex justify-content-center mt-auto pt-3 gap-2">
-                        <button
-                          className="btn btn-font btn-outline-danger btn-size"
-                          onClick={handleCancelSession}
-                        >
-                          Cancel Session
-                        </button>
+                        {sessionExercises.length > 0 && (
+                          <button
+                            className="btn btn-font btn-outline-danger btn-size"
+                            onClick={handleCancelSession}
+                          >
+                            Cancel Session
+                          </button>
+                        )}
                         {sessionExercises.length > 0 && (
                         <button
                           className="btn btn-font btn-primary btn-size"
