@@ -14,6 +14,8 @@ function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [showNewPassword, setShowNewPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   useEffect(() => {
     const tokenParam = searchParams.get('token')
@@ -116,28 +118,56 @@ function ResetPasswordPage() {
                 <Form onSubmit={handleSubmit}>
                   <Form.Group className="mb-3">
                     <Form.Label className="text-pure-white text-fonts">New Password</Form.Label>
-                    <Form.Control
-                      type="password"
-                      className="border-0 border-bottom bg-charcoal text-pure-white text-fonts"
-                      placeholder="Enter new password (min 6 characters)"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      required
-                      disabled={!token}
-                    />
+                    <div className="position-relative">
+                      <Form.Control
+                        type={showNewPassword ? "text" : "password"}
+                        className="border-0 border-bottom bg-charcoal text-pure-white text-fonts"
+                        placeholder="Enter new password (min 6 characters)"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        disabled={!token}
+                      />
+                      <button
+                        type="button"
+                        className="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent"
+                        style={{ right: '10px', color: '#ecececb6', cursor: 'pointer' }}
+                        onClick={() => setShowNewPassword(!showNewPassword)}
+                      >
+                        {showNewPassword ? (
+                          <i className="bi bi-eye-slash"></i>
+                        ) : (
+                          <i className="bi bi-eye"></i>
+                        )}
+                      </button>
+                    </div>
                   </Form.Group>
 
                   <Form.Group className="mb-3">
                     <Form.Label className="text-pure-white text-fonts">Confirm Password</Form.Label>
-                    <Form.Control
-                      type="password"
-                      className="border-0 border-bottom bg-charcoal text-pure-white text-fonts"
-                      placeholder="Confirm new password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                      disabled={!token}
-                    />
+                    <div className="position-relative">
+                      <Form.Control
+                        type={showConfirmPassword ? "text" : "password"}
+                        className="border-0 border-bottom bg-charcoal text-pure-white text-fonts"
+                        placeholder="Confirm new password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        disabled={!token}
+                      />
+                      <button
+                        type="button"
+                        className="position-absolute top-50 end-0 translate-middle-y border-0 bg-transparent"
+                        style={{ right: '10px', color: '#ecececb6', cursor: 'pointer' }}
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? (
+                          <i className="bi bi-eye-slash"></i>
+                        ) : (
+                          <i className="bi bi-eye"></i>
+                        )}
+                      </button>
+                    </div>
                   </Form.Group>
 
                   <Button
